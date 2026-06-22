@@ -32,14 +32,43 @@ import {
   Heart,
   Award,
   Shield,
-  PlusCircle
+  PlusCircle,
+  BarChart3,
+  TrendingUp
 } from 'lucide-react';
+import {
+  ResponsiveContainer,
+  LineChart as RechartsLineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RechartsTooltip,
+  Legend,
+  BarChart as RechartsBarChart,
+  Bar,
+  Cell
+} from 'recharts';
+
+interface VisitorLog {
+  id: number;
+  session_id: string;
+  path: string;
+  referrer: string | null;
+  user_agent: string;
+  created_at: string;
+}
 
 export default function AdminPanel() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState<
-    'dashboard' | 'bento' | 'hero' | 'projects' | 'news' | 'partners' | 'ebook_donation' | 'settings'
+    'dashboard' | 'bento' | 'hero' | 'projects' | 'news' | 'partners' | 'ebook_donation' | 'analytics' | 'settings'
   >('dashboard');
+  
+  const [visitorLogs, setVisitorLogs] = useState<VisitorLog[]>([]);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+  const [lookerStudioUrl, setLookerStudioUrl] = useState('');
+  const [isSavingUrl, setIsSavingUrl] = useState(false);
   
   const [blocks, setBlocks] = useState<BentoBlock[]>([]);
   
@@ -215,7 +244,38 @@ export default function AdminPanel() {
 
     const dp = await loadConfig<DonationPlanData[]>('donation_plans');
     if (dp) setDonationPlans(dp);
+
+    const lsu = await loadConfig<string>('looker_studio_url');
+    if (lsu) setLookerStudioUrl(lsu);
   };
+
+  const fetchVisitorLogs = async () => {
+    setAnalyticsLoading(true);
+    try {
+      const fourteenDaysAgo = new Date();
+      fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+      const isoString = fourteenDaysAgo.toISOString();
+
+      const { data, error } = await supabase
+        .from('visitor_logs')
+        .select('*')
+        .gte('created_at', isoString)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+      if (data) setVisitorLogs(data);
+    } catch (err) {
+      console.error('Failed to fetch visitor logs:', err);
+    } finally {
+      setAnalyticsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isLoggedIn && (activeTab === 'analytics' || activeTab === 'dashboard')) {
+      fetchVisitorLogs();
+    }
+  }, [activeTab, isLoggedIn]);
 
   const handleSizeChange = (size: 'large' | 'wide' | 'small') => {
     setBentoSize(size);
@@ -626,6 +686,85 @@ export default function AdminPanel() {
     );
   }
 
+  const getTodayStats = () => {
+    const today = new Date().toISOString().split('T')[0];
+    const todayLogs = visitorLogs.filter(log => log.created_at && log.created_at.startsWith(today));
+    const todayPV = todayLogs.length;
+    const todayUV = new Set(todayLogs.map(log => log.session_id)).size;
+
+    const totalPV = visitorLogs.length;
+    const totalUV = new Set(visitorLogs.map(log => log.session_id)).size;
+
+    return { todayPV, todayUV, totalPV, totalUV };
+  };
+  const { todayPV, todayUV, totalPV, totalUV } = getTodayStats();
+
+  const processDailyData = (logs: VisitorLog[]) => {
+    const daysMap: Record<string, { date: string; pv: number; uvSet: Set<string> }> = {};
+
+    // Initialize last 14 days
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateString = d.toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric' });
+      const key = d.toISOString().split('T')[0];
+      daysMap[key] = { date: dateString, pv: 0, uvSet: new Set<string>() };
+    }
+
+    logs.forEach(log => {
+      if (!log.created_at) return;
+      const logDate = new Date(log.created_at);
+      const key = logDate.toISOString().split('T')[0];
+      
+      if (daysMap[key]) {
+        daysMap[key].pv += 1;
+        daysMap[key].uvSet.add(log.session_id);
+      }
+    });
+
+    return Object.keys(daysMap).sort().map(key => ({
+      name: daysMap[key].date,
+      pv: daysMap[key].pv,
+      uv: daysMap[key].uvSet.size
+    }));
+  };
+
+  const processPopularPages = (logs: VisitorLog[]) => {
+    const pageMap: Record<string, number> = {};
+    logs.forEach(log => {
+      const path = log.path || '/';
+      pageMap[path] = (pageMap[path] || 0) + 1;
+    });
+
+    return Object.keys(pageMap)
+      .map(path => ({ path, pv: pageMap[path] }))
+      .sort((a, b) => b.pv - a.pv)
+      .slice(0, 8);
+  };
+
+  const processReferrers = (logs: VisitorLog[]) => {
+    const referrerMap: Record<string, number> = {};
+    logs.forEach(log => {
+      let ref = log.referrer || '直接造訪 / 直接輸入網址';
+      if (ref.includes('localhost')) {
+        ref = '本地開發測試 (localhost)';
+      } else {
+        try {
+          const url = new URL(ref);
+          ref = url.hostname;
+        } catch (e) {
+          // Keep original
+        }
+      }
+      referrerMap[ref] = (referrerMap[ref] || 0) + 1;
+    });
+
+    return Object.keys(referrerMap)
+      .map(name => ({ name, value: referrerMap[name] }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 5);
+  };
+
   return (
     <div className="min-h-screen bg-[#F3F4F6] text-slate-800 flex font-sans">
       
@@ -734,6 +873,16 @@ export default function AdminPanel() {
             </button>
 
             <button
+              onClick={() => setActiveTab('analytics')}
+              className={`w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all duration-300 ${
+                activeTab === 'analytics' ? 'bg-blue-600 text-white shadow-md' : 'text-white/70 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <TrendingUp className="w-4 h-4 text-cyan-400" />
+              <span>流量數據分析</span>
+            </button>
+
+            <button
               onClick={() => setActiveTab('settings')}
               className={`w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all duration-300 ${
                 activeTab === 'settings' ? 'bg-blue-600 text-white shadow-md' : 'text-white/70 hover:text-white hover:bg-white/5'
@@ -775,6 +924,7 @@ export default function AdminPanel() {
               {activeTab === 'news' && '最新消息管理 (Latest News CMS)'}
               {activeTab === 'partners' && '贊助商牆與金恆獎管理 (Partners & Awards CMS)'}
               {activeTab === 'ebook_donation' && '電子書與捐款管理 (Ebook & Donations)'}
+              {activeTab === 'analytics' && '流量數據分析 (Traffic Analytics)'}
               {activeTab === 'settings' && '系統基本設定 (Settings)'}
             </h1>
             <span className="text-[11px] text-slate-400 tracking-wide mt-1.5 block">
@@ -831,6 +981,58 @@ export default function AdminPanel() {
                   </div>
                   <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 font-bold">
                     <Shield className="w-5 h-5" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Traffic Summary Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-center justify-between">
+                  <div className="space-y-1">
+                    <span className="text-slate-400 text-xs font-bold block">今日瀏覽量 (Today's PV)</span>
+                    <span className="text-2xl font-black text-cyan-600 block">
+                      {analyticsLoading ? '...' : todayPV}
+                    </span>
+                  </div>
+                  <div className="w-10 h-10 rounded-xl bg-cyan-50 flex items-center justify-center text-cyan-600 font-bold">
+                    <TrendingUp className="w-5 h-5" />
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-center justify-between">
+                  <div className="space-y-1">
+                    <span className="text-slate-400 text-xs font-bold block">今日不重複訪客 (Today's UV)</span>
+                    <span className="text-2xl font-black text-cyan-600 block">
+                      {analyticsLoading ? '...' : todayUV}
+                    </span>
+                  </div>
+                  <div className="w-10 h-10 rounded-xl bg-cyan-50 flex items-center justify-center text-cyan-600 font-bold">
+                    <TrendingUp className="w-5 h-5 rotate-45" />
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-center justify-between">
+                  <div className="space-y-1">
+                    <span className="text-slate-400 text-xs font-bold block">14日累積流量 (14-day PV)</span>
+                    <span className="text-2xl font-black text-indigo-600 block">
+                      {analyticsLoading ? '...' : totalPV}
+                    </span>
+                  </div>
+                  <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold">
+                    <BarChart3 className="w-5 h-5" />
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer" onClick={() => setActiveTab('analytics')}>
+                  <div className="space-y-1">
+                    <span className="text-slate-400 text-xs font-bold block">累積訪客數 (14-day UV)</span>
+                    <span className="text-2xl font-black text-indigo-600 block flex items-center">
+                      {analyticsLoading ? '...' : totalUV}
+                      <span className="text-[10px] text-blue-600 font-bold ml-2 hover:underline">查看詳情 &rarr;</span>
+                    </span>
+                  </div>
+                  <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold">
+                    <BarChart3 className="w-5 h-5" />
                   </div>
                 </div>
               </div>
@@ -1782,35 +1984,272 @@ export default function AdminPanel() {
             </div>
           )}
 
+          {/* Traffic Analytics View */}
+          {activeTab === 'analytics' && (
+            <div className="space-y-8 animate-fade-in">
+              {/* Header/Intro card */}
+              <div className="bg-gradient-to-r from-cyan-50 to-blue-50 rounded-2xl p-8 border border-blue-100 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
+                <div className="space-y-2">
+                  <h2 className="text-lg font-extrabold text-blue-900 flex items-center">
+                    <TrendingUp className="w-5 h-5 text-blue-600 mr-2" />
+                    全方位流量數據中心 (All-in-One Analytics)
+                  </h2>
+                  <p className="text-xs text-blue-700 leading-relaxed max-w-2xl">
+                    此處整合了三合一流量分析系統：<strong>方案 A</strong> (Supabase 自訂軌跡)、<strong>方案 B</strong> (GA4 + Looker Studio)、以及 <strong>方案 C</strong> (Vercel 效能與流量分析)。讓您全面掌控網站的點擊、造訪以及速度表現！
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-3 shrink-0">
+                  <button 
+                    onClick={fetchVisitorLogs}
+                    disabled={analyticsLoading}
+                    className="px-4 py-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs rounded-xl shadow-sm transition-all duration-300 flex items-center space-x-1.5"
+                  >
+                    <span>{analyticsLoading ? '載入中...' : '🔄 重新整理數據'}</span>
+                  </button>
+                  <a
+                    href="https://vercel.com/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-4 py-2 bg-black hover:bg-slate-900 text-white font-bold text-xs rounded-xl shadow-md transition-all duration-300 flex items-center space-x-1.5"
+                  >
+                    <span>⚡ 前往 Vercel Analytics</span>
+                  </a>
+                </div>
+              </div>
+
+              {/* PLAN A: Supabase + Recharts */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* 1. Daily PV/UV Line Chart */}
+                <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col justify-between">
+                  <div>
+                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">方案 A - 趨勢圖</h3>
+                    <h4 className="text-sm font-extrabold text-slate-800 tracking-wide mb-4">近 14 日每日瀏覽量與獨立訪客</h4>
+                  </div>
+                  
+                  <div className="h-72 w-full mt-4">
+                    {visitorLogs.length === 0 ? (
+                      <div className="h-full flex items-center justify-center text-xs text-slate-400">
+                        {analyticsLoading ? '數據載入中...' : '無造訪記錄 (請確認 supabase 連結及 visitor_logs 表)'}
+                      </div>
+                    ) : (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <RechartsLineChart data={processDailyData(visitorLogs)} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                          <XAxis dataKey="name" tick={{ fontSize: 10 }} stroke="#94a3b8" />
+                          <YAxis tick={{ fontSize: 10 }} stroke="#94a3b8" />
+                          <RechartsTooltip contentStyle={{ fontSize: 11, borderRadius: 12, border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                          <Legend wrapperStyle={{ fontSize: 11, paddingTop: 10 }} />
+                          <Line type="monotone" dataKey="pv" name="瀏覽量 (PV)" stroke="#2563eb" strokeWidth={2.5} activeDot={{ r: 6 }} dot={{ r: 2 }} />
+                          <Line type="monotone" dataKey="uv" name="不重複訪客 (UV)" stroke="#06b6d4" strokeWidth={2.5} dot={{ r: 2 }} />
+                        </RechartsLineChart>
+                      </ResponsiveContainer>
+                    )}
+                  </div>
+                </div>
+
+                {/* 2. Referrers Pie/Table */}
+                <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col">
+                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">方案 A - 來源分析</h3>
+                  <h4 className="text-sm font-extrabold text-slate-800 tracking-wide mb-4">前五大流量來源渠道 (Referrers)</h4>
+                  
+                  <div className="flex-grow flex flex-col justify-center space-y-4">
+                    {visitorLogs.length === 0 ? (
+                      <div className="text-center text-xs text-slate-400 py-12">
+                        無來源渠道資料
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {processReferrers(visitorLogs).map((ref, idx) => {
+                          const maxVal = Math.max(...processReferrers(visitorLogs).map(r => r.value), 1);
+                          const percentage = Math.round((ref.value / maxVal) * 100);
+                          return (
+                            <div key={idx} className="space-y-1">
+                              <div className="flex justify-between items-center text-xs">
+                                <span className="font-semibold text-slate-700 truncate max-w-[180px]" title={ref.name}>
+                                  {ref.name}
+                                </span>
+                                <span className="text-slate-500 font-bold">{ref.value} 次</span>
+                              </div>
+                              <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                <div 
+                                  className="h-full rounded-full transition-all duration-500 bg-gradient-to-r from-blue-500 to-cyan-500" 
+                                  style={{ width: `${percentage}%` }}
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* 3. Popular Pages Bar Chart */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">方案 A - 熱門頁面</h3>
+                <h4 className="text-sm font-extrabold text-slate-800 tracking-wide mb-4">最受歡迎的造訪路徑排行 (Top 8 Paths)</h4>
+                
+                <div className="h-72 w-full mt-4">
+                  {visitorLogs.length === 0 ? (
+                    <div className="h-full flex items-center justify-center text-xs text-slate-400">
+                      暫無造訪頁面數據
+                    </div>
+                  ) : (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RechartsBarChart data={processPopularPages(visitorLogs)} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                        <XAxis dataKey="path" tick={{ fontSize: 9 }} stroke="#94a3b8" />
+                        <YAxis tick={{ fontSize: 10 }} stroke="#94a3b8" />
+                        <RechartsTooltip contentStyle={{ fontSize: 11, borderRadius: 12 }} />
+                        <Bar dataKey="pv" name="瀏覽次數 (PV)" fill="#3b82f6" radius={[4, 4, 0, 0]}>
+                          {processPopularPages(visitorLogs).map((_, index) => (
+                            <Cell key={`cell-${index}`} fill={index === 0 ? '#1d4ed8' : index < 3 ? '#2563eb' : '#60a5fa'} />
+                          ))}
+                        </Bar>
+                      </RechartsBarChart>
+                    </ResponsiveContainer>
+                  )}
+                </div>
+              </div>
+
+              {/* PLAN B: GA4 Embedded Looker Studio */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+                <div>
+                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">方案 B - Google Analytics 專業報表</h3>
+                  <h4 className="text-sm font-extrabold text-slate-800 tracking-wide">Looker Studio 互動式儀表板 (GA4)</h4>
+                </div>
+                
+                {lookerStudioUrl ? (
+                  <div className="w-full h-[600px] rounded-2xl border border-slate-200 overflow-hidden shadow-inner bg-slate-50 relative">
+                    <iframe
+                      src={lookerStudioUrl}
+                      frameBorder="0"
+                      style={{ border: 0, width: '100%', height: '100%' }}
+                      allowFullScreen
+                      sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+                    />
+                  </div>
+                ) : (
+                  <div className="rounded-2xl border border-dashed border-slate-300 p-12 text-center text-slate-500 bg-slate-50">
+                    <TrendingUp className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                    <p className="text-sm font-bold text-slate-700">尚未設定 Looker Studio 嵌入網址</p>
+                    <p className="text-xs text-slate-400 mt-2 max-w-md mx-auto">
+                      您可以前往「系統設定」分頁，貼上您在 Looker Studio 建立的 GA4 共用報表嵌入連結，即可在此直接查看高階的訪客行為分析。
+                    </p>
+                    <button 
+                      onClick={() => setActiveTab('settings')}
+                      className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition-colors"
+                    >
+                      前往設定
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* PLAN C: Vercel Web Analytics Overview */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                <div className="md:col-span-2 space-y-2">
+                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">方案 C - Edge Analytics & Vitals</h3>
+                  <h4 className="text-sm font-extrabold text-slate-800 tracking-wide">Vercel Web Analytics 效能與速度追蹤</h4>
+                  <p className="text-xs text-slate-500 leading-relaxed">
+                    Vercel Analytics 直接在網路邊緣 (Edge) 收集造訪與效能指標。它不依賴傳統的追蹤腳本，能準確評估 Google Core Web Vitals（如最大內容渲染時間 LCP、首次輸入延遲 FID），幫助改善網站 SEO 與速度體驗。
+                  </p>
+                </div>
+                <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 flex flex-col justify-between h-full space-y-4">
+                  <div className="space-y-1">
+                    <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full inline-block">已在程式碼中載入</span>
+                    <p className="text-xs text-slate-400 leading-relaxed mt-1">
+                      只需點擊 Vercel 控制台的一鍵啟用按鈕即可生效。
+                    </p>
+                  </div>
+                  <a
+                    href="https://vercel.com/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-full text-center py-2.5 bg-black hover:bg-slate-900 text-white font-bold text-xs rounded-xl shadow-md transition-all duration-300 block"
+                  >
+                    前往 Vercel 控制台 &rarr;
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* 8. SETTINGS VIEW */}
           {activeTab === 'settings' && (
-            <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center shadow-sm max-w-2xl mx-auto my-12 animate-fade-in">
-              <Settings className="w-16 h-16 text-slate-300 mx-auto mb-6" />
-              <h3 className="text-lg font-bold text-slate-800 tracking-wide mb-2">
-                Settings 系統設定
-              </h3>
-              <p className="text-sm text-slate-400 leading-relaxed max-w-sm mx-auto mb-6">
-                本後台整合了 Supabase 與 Cloudinary。如果您需要重置所有前台資料至出廠預設狀態，請點擊下方按鈕。
-              </p>
-              <button
-                type="button"
-                onClick={async () => {
-                  if (confirm('⚠️ 警告：這將會使用 siteInitialData.ts 的原始寫死資料，直接覆蓋並重置 Supabase 雲端與 localStorage 快取上的所有設定！確定要繼續嗎？')) {
+            <div className="space-y-8 animate-fade-in max-w-2xl mx-auto my-6">
+              {/* Looker Studio Config */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm space-y-6">
+                <h3 className="text-sm font-extrabold text-slate-800 tracking-wide border-b border-slate-100 pb-3 flex items-center space-x-2">
+                  <Settings className="w-4 h-4 text-blue-600" />
+                  <span>Google Looker Studio 報表設定</span>
+                </h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  請將您在 Looker Studio 建立並共用的 Google Analytics 報表「嵌入網址（Embed URL）」貼在下方。系統將會即時更新「流量數據分析」中的嵌入報表。
+                </p>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-600 block">Looker Studio 嵌入 URL</label>
+                  <input
+                    type="url"
+                    value={lookerStudioUrl}
+                    onChange={(e) => setLookerStudioUrl(e.target.value)}
+                    placeholder="https://lookerstudio.google.com/embed/reporting/..."
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                  />
+                  <span className="text-[10px] text-slate-400 block pl-1">
+                    嵌入網址格式通常為 <code>https://lookerstudio.google.com/embed/reporting/xxxx-xxxx/page/xxxx</code>
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setIsSavingUrl(true);
                     try {
-                      for (const key of Object.keys(DEFAULT_CONFIGS)) {
-                        await saveConfig(key, DEFAULT_CONFIGS[key]);
-                      }
-                      alert('✨ 系統已成功重置為出廠預設值！');
-                      loadAllEditStates();
-                    } catch (err) {
-                      alert('重置失敗');
+                      await saveConfig('looker_studio_url', lookerStudioUrl);
+                      alert('✨ Looker Studio URL 已儲存並同步至資料庫！');
+                    } catch (e) {
+                      alert('儲存失敗');
+                    } finally {
+                      setIsSavingUrl(false);
                     }
-                  }
-                }}
-                className="px-5 py-2.5 rounded-xl border border-red-200 hover:border-red-500 bg-transparent text-red-500 text-xs font-semibold tracking-wide shadow-sm hover:bg-red-50 hover:shadow transition-all duration-300"
-              >
-                🚨 覆蓋並重置所有前台資料為預設值
-              </button>
+                  }}
+                  disabled={isSavingUrl}
+                  className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold text-xs shadow transition-all duration-300"
+                >
+                  {isSavingUrl ? '儲存中...' : '儲存嵌入報表連結'}
+                </button>
+              </div>
+
+              {/* Reset Config */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm text-center">
+                <Settings className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                <h3 className="text-sm font-extrabold text-slate-800 tracking-wide mb-2">
+                  重置所有系統資料 (Factory Reset)
+                </h3>
+                <p className="text-xs text-slate-400 leading-relaxed max-w-sm mx-auto mb-6">
+                  本後台整合了 Supabase 與 Cloudinary。如果您需要重置所有前台資料至出廠預設狀態，請點擊下方按鈕。
+                </p>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (confirm('⚠️ 警告：這將會使用 siteInitialData.ts 的原始寫死資料，直接覆蓋並重置 Supabase 雲端與 localStorage 快取上的所有設定！確定要繼續嗎？')) {
+                      try {
+                        for (const key of Object.keys(DEFAULT_CONFIGS)) {
+                          await saveConfig(key, DEFAULT_CONFIGS[key]);
+                        }
+                        alert('✨ 系統已成功重置為出廠預設值！');
+                        loadAllEditStates();
+                      } catch (err) {
+                        alert('重置失敗');
+                      }
+                    }
+                  }}
+                  className="px-4 py-2 rounded-xl border border-red-200 hover:border-red-500 bg-transparent text-red-500 text-xs font-semibold tracking-wide shadow-sm hover:bg-red-50 hover:shadow transition-all duration-300"
+                >
+                  🚨 覆蓋並重置所有前台資料為預設值
+                </button>
+              </div>
             </div>
           )}
 

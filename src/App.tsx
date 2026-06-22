@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import HeroSlider from './components/HeroSlider';
 import CoreProjects from './components/CoreProjects';
@@ -9,6 +9,61 @@ import BookCTA from './components/BookCTA';
 import DonationCTA from './components/DonationCTA';
 import Footer from './components/Footer';
 import AdminPanel from './components/AdminPanel';
+import { supabase } from './utils/supabaseClient';
+
+function AnalyticsTracker() {
+  const location = useLocation();
+
+  useEffect(() => {
+    let sessionId = sessionStorage.getItem('visitor_session_id');
+    if (!sessionId) {
+      sessionId = 'sess_' + Math.random().toString(36).substring(2, 15) + '_' + Date.now();
+      sessionStorage.setItem('visitor_session_id', sessionId);
+    }
+
+    const logPageVisit = async () => {
+      try {
+        const path = location.pathname + (window.location.hash || '');
+        const referrer = document.referrer || null;
+        const userAgent = navigator.userAgent;
+
+        await supabase.from('visitor_logs').insert({
+          session_id: sessionId,
+          path: path,
+          referrer: referrer,
+          user_agent: userAgent
+        });
+      } catch (error) {
+        console.error('Visitor logging failed:', error);
+      }
+    };
+
+    logPageVisit();
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const handleHashChange = async () => {
+      const sessionId = sessionStorage.getItem('visitor_session_id');
+      if (!sessionId) return;
+      try {
+        const path = location.pathname + (window.location.hash || '');
+        await supabase.from('visitor_logs').insert({
+          session_id: sessionId,
+          path: path,
+          referrer: document.referrer || null,
+          user_agent: navigator.userAgent
+        });
+      } catch (error) {
+        console.error('Hash logging failed:', error);
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [location.pathname]);
+
+  return null;
+}
 
 function MainPortal() {
   const [activeSection, setActiveSection] = useState('hero');
@@ -104,6 +159,7 @@ function MainPortal() {
 export default function App() {
   return (
     <Router>
+      <AnalyticsTracker />
       <Routes>
         {/* Main Portal Landing Page */}
         <Route path="/" element={<MainPortal />} />
