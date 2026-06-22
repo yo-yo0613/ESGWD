@@ -167,7 +167,14 @@ export default function BentoGridSection() {
 
                   <div className="pt-6">
                     <button className="w-full py-3 rounded-xl bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold tracking-wider uppercase shadow-md transition-colors duration-300">
-                      {block.            // 3. Event & News Card Layout (split design or background picture card)
+                      {block.buttonText || '立即支持'}
+                    </button>
+                  </div>
+                </div>
+              );
+            }
+
+            // 3. Event & News Card Layout (split design or background picture card)
             return (
               <div
                 key={block.id}
@@ -209,15 +216,6 @@ export default function BentoGridSection() {
                     <span>了解詳情</span>
                     <ArrowUpRight className="w-3.5 h-3.5" />
                   </span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-}                  </span>
                 </div>
               </div>
             );
