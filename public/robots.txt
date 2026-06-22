@@ -1,0 +1,9 @@
+# https://www.robotstxt.org/robotstxt.html
+
+User-agent: *
+Allow: /
+
+# Disallow admin panel search engine index
+Disallow: /admin
+
+Sitemap: https://esgwd.vercel.app/sitemap.xml
