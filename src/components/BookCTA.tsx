@@ -22,7 +22,7 @@ export default function BookCTA() {
   }, []);
 
   return (
-    <section className="py-24 bg-brand-navy-dark text-white relative overflow-hidden">
+    <section className="py-24 bg-white text-slate-800 relative overflow-hidden">
       {/* Decorative Aura */}
       <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[600px] h-[600px] bg-brand-amber/5 rounded-full blur-[120px] pointer-events-none" />
 
@@ -33,10 +33,10 @@ export default function BookCTA() {
             <span className="text-xs font-bold uppercase tracking-widest text-brand-amber bg-brand-amber/10 px-3.5 py-1.5 rounded-full">
               PUBLICATIONS & KNOWLEDGE
             </span>
-            <h2 className="text-3xl md:text-5xl font-heading font-extrabold text-white leading-tight">
+            <h2 className="text-3xl md:text-5xl font-heading font-extrabold text-slate-900 leading-tight">
               {bookData.title}
             </h2>
-            <p className="text-white/60 text-base md:text-lg leading-relaxed font-light">
+            <p className="text-slate-600 text-base md:text-lg leading-relaxed font-light">
               {bookData.description}
             </p>
           </div>
@@ -47,12 +47,12 @@ export default function BookCTA() {
               const IconComponent = (Lucide as any)[highlight.iconName] || Lucide.HelpCircle;
               return (
                 <div key={index} className="flex items-start space-x-3">
-                  <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-brand-amber shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200/80 flex items-center justify-center text-brand-amber shrink-0">
                     <IconComponent className="w-4.5 h-4.5" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-semibold text-white">{highlight.title}</h4>
-                    <p className="text-xs text-white/40 leading-relaxed mt-1">{highlight.desc}</p>
+                    <h4 className="text-sm font-semibold text-slate-800">{highlight.title}</h4>
+                    <p className="text-xs text-slate-500 leading-relaxed mt-1">{highlight.desc}</p>
                   </div>
                 </div>
               );
@@ -69,8 +69,8 @@ export default function BookCTA() {
               <Lucide.Download className="w-5 h-5" />
               <span>{bookData.buttonText}</span>
             </a>
-            <span className="block text-[11px] text-white/35 mt-3 tracking-wide pl-2">
-              PDF 格式 · 繁體中文版 · 完整收錄 12 個核心章節
+            <span className="block text-[11px] text-slate-400 mt-3 tracking-wide pl-2">
+              PDF 格式 · 繁體中文版 · 完整收完整 12 個核心章節
             </span>
           </div>
         </div>

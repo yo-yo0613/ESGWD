@@ -15,7 +15,7 @@ export default function Footer({ onNavigate }: FooterProps) {
   ];
 
   return (
-    <footer className="bg-brand-navy-dark text-white/70 border-t border-white/5 pt-16 pb-8">
+    <footer className="bg-slate-900 text-slate-400 border-t border-slate-800 pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
         {/* Brand Info */}
         <div className="space-y-4">
@@ -27,12 +27,12 @@ export default function Footer({ onNavigate }: FooterProps) {
               <span className="font-heading font-bold text-lg text-white tracking-wider block leading-none">
                 世界公民基金會
               </span>
-              <span className="text-[9px] text-white/50 tracking-widest uppercase mt-1 block">
+              <span className="text-[9px] text-slate-400 tracking-widest uppercase mt-1 block">
                 World Citizen Foundation
               </span>
             </div>
           </div>
-          <p className="text-sm text-white/50 leading-relaxed pt-2">
+          <p className="text-sm text-slate-400 leading-relaxed pt-2">
             致力於推動世界公民素養教育、永續發展與科技雙軸轉型。深耕社會公益、良善品格與跨界藝術的完美融合，攜手企業與大眾共創綠色未來。
           </p>
           <div className="flex space-x-4 pt-2">
@@ -94,11 +94,11 @@ export default function Footer({ onNavigate }: FooterProps) {
           <h4 className="text-white font-semibold text-base mb-6 tracking-wide relative after:content-[''] after:absolute after:bottom-[-8px] after:left-0 after:w-8 after:h-0.5 after:bg-brand-amber">
             認證與主管主管課程
           </h4>
-          <p className="text-sm text-white/50 leading-relaxed">
+          <p className="text-sm text-slate-400 leading-relaxed">
             本會榮獲內政部公益社團認證，並提供「董監事與公司治理主管認證課程」，具備法律效力之學分證明。
           </p>
           <div className="pt-2">
-            <span className="inline-block px-3 py-1.5 rounded bg-brand-navy border border-white/10 text-xs font-semibold text-brand-amber tracking-wider">
+            <span className="inline-block px-3 py-1.5 rounded bg-slate-950 border border-slate-800 text-xs font-semibold text-brand-amber tracking-wider">
               政府立案字號：台內社字第 1120005678 號
             </span>
           </div>
@@ -106,7 +106,7 @@ export default function Footer({ onNavigate }: FooterProps) {
       </div>
 
       {/* Bottom Bar */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-white/40 space-y-4 md:space-y-0">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-slate-500 space-y-4 md:space-y-0">
         <div>
           © {new Date().getFullYear()} 世界公民基金會 World Citizen Foundation. All Rights Reserved.
         </div>

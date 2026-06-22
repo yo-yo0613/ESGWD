@@ -44,7 +44,7 @@ export default function LatestNews() {
     : visibleNews.filter(item => item.category === activeTab);
 
   return (
-    <section className="py-24 bg-brand-navy-dark text-white relative">
+    <section className="py-24 bg-white text-slate-800 relative">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 space-y-6 md:space-y-0">
@@ -52,21 +52,21 @@ export default function LatestNews() {
             <span className="text-xs font-bold uppercase tracking-widest text-brand-amber bg-brand-amber/10 px-3.5 py-1.5 rounded-full">
               LATEST UPDATES
             </span>
-            <h2 className="text-3xl md:text-5xl font-heading font-extrabold text-white">
+            <h2 className="text-3xl md:text-5xl font-heading font-extrabold text-slate-900">
               最新消息與動態
             </h2>
           </div>
           
           {/* Tabs - Glassmorphism style */}
-          <div className="flex flex-wrap gap-2 p-1.5 bg-brand-navy/60 border border-white/10 rounded-xl max-w-max">
+          <div className="flex flex-wrap gap-2 p-1.5 bg-slate-100 border border-slate-200/80 rounded-xl max-w-max">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`relative px-5 py-2.5 rounded-lg text-sm font-medium tracking-wide transition-all duration-300 ${
                   activeTab === tab.id 
-                    ? 'text-brand-navy font-bold' 
-                    : 'text-white/70 hover:text-white'
+                    ? 'text-white font-bold' 
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 {activeTab === tab.id && (
@@ -96,7 +96,7 @@ export default function LatestNews() {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.4 }}
-                className="group flex flex-col justify-between bg-brand-navy border border-white/5 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-brand-orange/5 hover:border-white/15 transition-all duration-300"
+                className="group flex flex-col justify-between bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-md shadow-slate-100/50 hover:shadow-xl hover:shadow-slate-200/50 hover:border-slate-300 transition-all duration-300"
               >
                 <div>
                   {/* Card Image */}
@@ -108,7 +108,7 @@ export default function LatestNews() {
                       loading="lazy"
                     />
                     {/* Dark gradient overlay on image */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-brand-navy to-transparent opacity-60" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-60" />
                     
                     {/* Badge */}
                     <span className={`absolute top-4 left-4 text-xs font-semibold px-3 py-1.5 rounded-lg text-white backdrop-blur-md border border-white/10 ${
@@ -123,18 +123,18 @@ export default function LatestNews() {
                   {/* Card Content */}
                   <div className="p-6 md:p-8 space-y-4">
                     {/* Date */}
-                    <div className="flex items-center space-x-2 text-xs text-white/40">
+                    <div className="flex items-center space-x-2 text-xs text-slate-400">
                       <Calendar className="w-3.5 h-3.5" />
                       <time dateTime={item.date}>{item.date}</time>
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-lg md:text-xl font-heading font-bold text-white group-hover:text-brand-amber transition-colors duration-300 line-clamp-2 leading-snug">
+                    <h3 className="text-lg md:text-xl font-heading font-bold text-slate-800 group-hover:text-brand-orange transition-colors duration-300 line-clamp-2 leading-snug">
                       {item.title}
                     </h3>
 
                     {/* Summary */}
-                    <p className="text-sm text-white/50 leading-relaxed font-light line-clamp-3">
+                    <p className="text-sm text-slate-500 leading-relaxed font-light line-clamp-3">
                       {item.summary}
                     </p>
                   </div>
@@ -142,7 +142,7 @@ export default function LatestNews() {
 
                 {/* Read More button */}
                 <div className="px-6 md:px-8 pb-6 md:pb-8 pt-2">
-                  <button className="flex items-center space-x-1.5 text-xs font-bold text-brand-amber group-hover:text-brand-orange transition-colors duration-300">
+                  <button className="flex items-center space-x-1.5 text-xs font-bold text-brand-orange group-hover:text-brand-orange/80 transition-colors duration-300">
                     <span>詳細閱讀</span>
                     <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-300" />
                   </button>
@@ -157,7 +157,7 @@ export default function LatestNews() {
           <div className="text-center">
             <button
               onClick={handleLoadMore}
-              className="px-8 py-3.5 rounded-xl border border-white/20 hover:border-brand-amber bg-transparent text-white/80 hover:text-brand-amber text-sm font-semibold tracking-wide shadow-md transition-all duration-300"
+              className="px-8 py-3.5 rounded-xl border border-slate-300 hover:border-slate-800 bg-transparent text-slate-700 hover:text-slate-900 text-sm font-semibold tracking-wide shadow-md transition-all duration-300"
             >
               載入更多消息
             </button>

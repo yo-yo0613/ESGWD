@@ -36,10 +36,10 @@ export default function DonationCTA() {
   };
 
   return (
-    <section className="py-24 bg-brand-navy text-white relative overflow-hidden">
+    <section className="py-24 bg-slate-50 text-slate-800 relative overflow-hidden">
       {/* Background decorations */}
       <div className="absolute top-1/4 right-0 w-[500px] h-[500px] bg-brand-orange/5 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-full h-[300px] bg-gradient-to-t from-brand-navy-dark to-transparent" />
+      <div className="absolute bottom-0 left-0 w-full h-[300px] bg-gradient-to-t from-slate-100 to-transparent" />
 
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
         {/* Section Header */}
@@ -47,10 +47,10 @@ export default function DonationCTA() {
           <span className="text-xs font-bold uppercase tracking-widest text-brand-amber bg-brand-amber/10 px-3.5 py-1.5 rounded-full">
             MEMBERSHIP & SUPPORT
           </span>
-          <h2 className="text-3xl md:text-5xl font-heading font-extrabold text-white">
+          <h2 className="text-3xl md:text-5xl font-heading font-extrabold text-slate-900">
             桂冠會員認捐計畫
           </h2>
-          <p className="text-white/60 text-base md:text-lg">
+          <p className="text-slate-600 text-base md:text-lg">
             您的每一筆支持，都將投入世界公民教材研發、偏鄉學童音樂會，以及企業綠色轉型論壇的深耕與推廣。
           </p>
         </div>
@@ -67,8 +67,8 @@ export default function DonationCTA() {
                 onClick={() => setSelectedPlan(plan.id)}
                 className={`flex flex-col justify-between p-8 md:p-10 rounded-2xl border transition-all duration-500 cursor-pointer relative ${
                   isSelected 
-                    ? 'border-brand-amber bg-brand-navy-dark/90 shadow-2xl scale-[1.03] ring-1 ring-brand-amber/35' 
-                    : 'border-white/10 bg-brand-navy-light/40 hover:border-white/20 hover:bg-brand-navy-light/60'
+                    ? 'border-brand-amber bg-white shadow-2xl scale-[1.03] ring-1 ring-brand-amber/35' 
+                    : 'border-slate-200 bg-white hover:border-slate-350 hover:bg-slate-50/50 hover:shadow-lg'
                 }`}
               >
                 {/* Featured banner */}
@@ -81,17 +81,17 @@ export default function DonationCTA() {
                 <div className="space-y-6">
                   {/* Plan Name & Pricing */}
                   <div className="space-y-2">
-                    <h3 className={`text-xl font-heading font-bold ${isSelected ? 'text-brand-amber' : 'text-white/90'}`}>
+                    <h3 className={`text-xl font-heading font-bold ${isSelected ? 'text-brand-orange' : 'text-slate-800'}`}>
                       {plan.name}
                     </h3>
                     <div className="flex items-baseline space-x-1">
-                      <span className="text-3xl font-extrabold text-white">{plan.price}</span>
-                      <span className="text-xs text-white/40">/ {plan.pricePeriod}</span>
+                      <span className="text-3xl font-extrabold text-slate-900">{plan.price}</span>
+                      <span className="text-xs text-slate-400">/ {plan.pricePeriod}</span>
                     </div>
                   </div>
 
                   {/* Gift display block */}
-                  <div className="p-4 rounded-xl bg-white/5 border border-white/5 space-y-2">
+                  <div className="p-4 rounded-xl bg-slate-100/50 border border-slate-200/50 space-y-2">
                     <div className="flex items-center space-x-2">
                       <div className={`w-7 h-7 rounded-lg bg-gradient-to-tr ${plan.color} flex items-center justify-center text-white shrink-0`}>
                         <IconComp className="w-4 h-4" />
@@ -101,17 +101,17 @@ export default function DonationCTA() {
                         <span>認捐滿額禮：{plan.giftTitle}</span>
                       </span>
                     </div>
-                    <p className="text-[11px] text-white/50 leading-relaxed font-light">
+                    <p className="text-[11px] text-slate-500 leading-relaxed font-light">
                       {plan.giftDesc}
                     </p>
                   </div>
 
                   {/* Benefits List */}
                   <div className="space-y-3 pt-2">
-                    <span className="text-[10px] text-white/30 tracking-wider uppercase block">方案權益</span>
+                    <span className="text-[10px] text-slate-400 tracking-wider uppercase block">方案權益</span>
                     <ul className="space-y-2 text-xs">
                       {plan.benefits.map((benefit, i) => (
-                        <li key={i} className="flex items-center space-x-2 text-white/70">
+                        <li key={i} className="flex items-center space-x-2 text-slate-600">
                           <span className="w-1.5 h-1.5 rounded-full bg-brand-amber shrink-0" />
                           <span>{benefit}</span>
                         </li>
@@ -122,13 +122,13 @@ export default function DonationCTA() {
 
                 {/* Select Radio display */}
                 <div className="pt-8 flex items-center justify-between">
-                  <span className="text-xs text-white/45">
+                  <span className="text-xs text-slate-500">
                     {isSelected ? '已選取此認捐方案' : '點擊選取此方案'}
                   </span>
                   <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-all ${
-                    isSelected ? 'border-brand-amber bg-brand-amber' : 'border-white/30'
+                    isSelected ? 'border-brand-amber bg-brand-amber' : 'border-slate-355'
                   }`}>
-                    {isSelected && <div className="w-2.5 h-2.5 rounded-full bg-brand-navy" />}
+                    {isSelected && <div className="w-2.5 h-2.5 rounded-full bg-white" />}
                   </div>
                 </div>
               </div>
@@ -146,7 +146,7 @@ export default function DonationCTA() {
             <span>立即捐款支持我們</span>
             <Lucide.ChevronRight className="w-4 h-4" />
           </button>
-          <p className="text-xs text-white/40 max-w-md mx-auto leading-relaxed">
+          <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
             依法捐款可開立節稅收據。本基金會採用經國家認證之 SSL 交易加密系統，保障您的付款隱私與交易安全。
           </p>
         </div>

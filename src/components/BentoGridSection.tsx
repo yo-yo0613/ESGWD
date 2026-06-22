@@ -68,7 +68,7 @@ export default function BentoGridSection() {
   };
 
   return (
-    <section className="py-24 bg-brand-navy border-t border-white/5 relative overflow-hidden">
+    <section className="py-24 bg-white border-t border-slate-200 relative overflow-hidden">
       {/* Decorative Light */}
       <div className="absolute top-1/2 left-3/4 -translate-y-1/2 w-[500px] h-[500px] bg-brand-amber/5 rounded-full blur-[120px] pointer-events-none" />
 
@@ -79,10 +79,10 @@ export default function BentoGridSection() {
             <span className="text-xs font-bold uppercase tracking-widest text-brand-amber bg-brand-amber/10 px-3.5 py-1.5 rounded-full">
               Bento Grid Showcase
             </span>
-            <h2 className="text-3xl md:text-5xl font-heading font-extrabold text-white">
+            <h2 className="text-3xl md:text-5xl font-heading font-extrabold text-slate-900">
               便當盒動態網格看板
             </h2>
-            <p className="text-white/60 text-sm md:text-base">
+            <p className="text-slate-600 text-sm md:text-base">
               結合視覺張力與資訊密度的模組化排版，動態呈現基金會最核心的活動、最新消息與企業會員權益。
             </p>
           </div>
@@ -110,7 +110,7 @@ export default function BentoGridSection() {
               return (
                 <div
                   key={block.id}
-                  className={`group relative flex flex-col justify-end overflow-hidden rounded-3xl border border-white/10 shadow-lg hover:shadow-2xl hover:border-brand-amber/35 hover:-translate-y-1 transition-all duration-300 cursor-pointer ${sizeClass}`}
+                  className={`group relative flex flex-col justify-end overflow-hidden rounded-3xl border border-slate-200/80 shadow-lg hover:shadow-2xl hover:border-brand-amber hover:-translate-y-1 transition-all duration-300 cursor-pointer ${sizeClass}`}
                 >
                   {/* Background Image */}
                   {block.imageUrl ? (
@@ -120,7 +120,7 @@ export default function BentoGridSection() {
                       className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                     />
                   ) : (
-                    <div className="absolute inset-0 bg-brand-navy-light" />
+                    <div className="absolute inset-0 bg-slate-100" />
                   )}
 
                   {/* Gradient Black Overlay */}
@@ -166,29 +166,22 @@ export default function BentoGridSection() {
                   </div>
 
                   <div className="pt-6">
-                    <button className="w-full py-3 rounded-xl bg-brand-navy text-white hover:bg-brand-navy-dark text-xs font-bold tracking-wider uppercase shadow-md transition-colors duration-300">
-                      {block.buttonText || '立即支持'}
-                    </button>
-                  </div>
-                </div>
-              );
-            }
-
-            // 3. Event & News Card Layout (split design or background picture card)
+                    <button className="w-full py-3 rounded-xl bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold tracking-wider uppercase shadow-md transition-colors duration-300">
+                      {block.            // 3. Event & News Card Layout (split design or background picture card)
             return (
               <div
                 key={block.id}
-                className={`group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-white/10 bg-brand-navy-light/65 p-6 md:p-8 shadow-lg hover:shadow-2xl hover:border-brand-amber/35 hover:-translate-y-1 transition-all duration-300 cursor-pointer ${sizeClass}`}
+                className={`group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-6 md:p-8 shadow-sm hover:shadow-xl hover:border-slate-350 hover:-translate-y-1 transition-all duration-300 cursor-pointer ${sizeClass}`}
               >
-                {/* Background image cover with heavy dark overlay */}
+                {/* Background image cover with light overlay */}
                 {block.imageUrl && (
                   <>
                     <img
                       src={block.imageUrl}
                       alt={block.title}
-                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out opacity-25"
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out opacity-20"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-brand-navy-dark via-brand-navy-dark/90 to-transparent z-0" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-white via-white/80 to-transparent z-0" />
                   </>
                 )}
 
@@ -200,22 +193,31 @@ export default function BentoGridSection() {
                         <span>{block.tag}</span>
                       </span>
                     )}
-                    <span className="text-[10px] text-white/40 flex items-center space-x-1">
+                    <span className="text-[10px] text-slate-400 flex items-center space-x-1">
                       <Calendar className="w-3 h-3" />
                       <span>{block.date}</span>
                     </span>
                   </div>
 
-                  <h3 className="text-lg font-heading font-bold text-white group-hover:text-brand-amber transition-colors duration-300 leading-snug">
+                  <h3 className="text-lg font-heading font-bold text-slate-800 group-hover:text-brand-orange transition-colors duration-300 leading-snug">
                     {block.title}
                   </h3>
                 </div>
 
-                <div className="relative z-10 pt-4 border-t border-white/5 text-right">
-                  <span className="inline-flex items-center space-x-1 text-xs font-bold text-brand-amber group-hover:text-brand-orange transition-colors">
+                <div className="relative z-10 pt-4 border-t border-slate-100 text-right">
+                  <span className="inline-flex items-center space-x-1 text-xs font-bold text-brand-orange group-hover:text-brand-orange/80 transition-colors">
                     <span>了解詳情</span>
                     <ArrowUpRight className="w-3.5 h-3.5" />
                   </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}                  </span>
                 </div>
               </div>
             );

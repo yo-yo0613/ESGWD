@@ -32,11 +32,18 @@ export default function Navbar({ activeSection, onNavigate }: NavbarProps) {
     setIsOpen(false);
   };
 
+  const logoTitleClass = scrolled 
+    ? 'text-slate-800' 
+    : 'text-slate-800 lg:text-white';
+  const logoSubClass = scrolled 
+    ? 'text-slate-400' 
+    : 'text-slate-400 lg:text-white/50';
+
   return (
     <>
-      <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 bg-brand-navy border-b border-white/10 shadow-lg py-4 ${
+      <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 bg-white border-b border-slate-200/80 shadow-md py-4 ${
         scrolled 
-          ? 'lg:bg-brand-navy/90 lg:backdrop-blur-md lg:border-b lg:border-white/10 lg:shadow-lg lg:py-4' 
+          ? 'lg:bg-white/90 lg:backdrop-blur-md lg:border-b lg:border-slate-200/80 lg:shadow-md lg:py-4' 
           : 'lg:bg-transparent lg:border-transparent lg:shadow-none lg:py-6'
       }`}>
         <div className="max-w-7xl mx-auto px-6 md:px-12 flex justify-between items-center relative z-50">
@@ -49,10 +56,10 @@ export default function Navbar({ activeSection, onNavigate }: NavbarProps) {
               ESG
             </div>
             <div>
-              <span className="font-heading font-bold text-xl text-white tracking-wider block leading-none">
+              <span className={`font-heading font-bold text-xl tracking-wider block leading-none transition-colors duration-300 ${logoTitleClass}`}>
                 世界公民基金會
               </span>
-              <span className="text-[10px] text-white/50 tracking-widest uppercase mt-1 block">
+              <span className={`text-[10px] tracking-widest uppercase mt-1 block transition-colors duration-300 ${logoSubClass}`}>
                 World Citizen Foundation
               </span>
             </div>
@@ -67,8 +74,10 @@ export default function Navbar({ activeSection, onNavigate }: NavbarProps) {
                   onClick={() => handleNavClick(item.id)}
                   className={`relative py-2 text-sm font-medium tracking-wide transition-colors duration-300 ${
                     activeSection === item.id 
-                      ? 'text-brand-amber font-semibold' 
-                      : 'text-white/80 hover:text-white'
+                      ? 'text-brand-orange font-bold' 
+                      : scrolled
+                        ? 'text-slate-600 hover:text-slate-900'
+                        : 'text-slate-600 lg:text-white/80 lg:hover:text-white hover:text-slate-900'
                   }`}
                 >
                   {item.name}
@@ -79,8 +88,14 @@ export default function Navbar({ activeSection, onNavigate }: NavbarProps) {
               ))}
             </div>
 
-            <div className="flex items-center space-x-4 border-l border-white/10 pl-6">
-              <button className="text-white/70 hover:text-white transition-colors duration-300 flex items-center space-x-1 text-sm font-medium">
+            <div className={`flex items-center space-x-4 border-l pl-6 transition-colors duration-300 ${
+              scrolled ? 'border-slate-200' : 'border-slate-200 lg:border-white/10'
+            }`}>
+              <button className={`transition-colors duration-300 flex items-center space-x-1 text-sm font-medium ${
+                scrolled
+                  ? 'text-slate-600 hover:text-slate-900'
+                  : 'text-slate-600 lg:text-white/70 lg:hover:text-white hover:text-slate-900'
+              }`}>
                 <Globe className="w-4 h-4" />
                 <span>繁中</span>
               </button>
@@ -97,7 +112,7 @@ export default function Navbar({ activeSection, onNavigate }: NavbarProps) {
           <div className="lg:hidden flex items-center space-x-4">
             <button 
               onClick={() => setIsOpen(!isOpen)}
-              className="text-white hover:text-brand-amber transition-colors duration-300"
+              className="text-slate-700 hover:text-brand-orange transition-colors duration-300"
             >
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -115,10 +130,10 @@ export default function Navbar({ activeSection, onNavigate }: NavbarProps) {
 
       {/* Mobile Drawer */}
       <div 
-        className={`fixed inset-y-0 right-0 w-full max-w-sm border-l border-white/10 shadow-2xl z-40 transition-transform duration-500 transform lg:hidden ${
+        className={`fixed inset-y-0 right-0 w-full max-w-sm border-l border-slate-200 shadow-2xl z-40 transition-transform duration-500 transform lg:hidden ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
-        style={{ backgroundColor: '#0B192C' }}
+        style={{ backgroundColor: '#FFFFFF' }}
       >
         <div className="h-full flex flex-col justify-between p-8 pt-24">
           <div className="space-y-6">
@@ -126,10 +141,10 @@ export default function Navbar({ activeSection, onNavigate }: NavbarProps) {
               <button
                 key={item.id}
                 onClick={() => handleNavClick(item.id)}
-                className={`w-full text-left py-3 text-lg font-medium transition-colors duration-300 border-b border-white/5 ${
+                className={`w-full text-left py-3 text-lg font-medium transition-colors duration-300 border-b border-slate-100 ${
                   activeSection === item.id 
-                    ? 'text-brand-amber font-semibold' 
-                    : 'text-white/70 hover:text-white'
+                    ? 'text-brand-orange font-bold' 
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 {item.name}
@@ -138,7 +153,7 @@ export default function Navbar({ activeSection, onNavigate }: NavbarProps) {
           </div>
 
           <div className="space-y-4">
-            <button className="w-full py-3 border border-white/10 rounded-xl text-white hover:bg-white/5 transition-colors duration-300 flex items-center justify-center space-x-2">
+            <button className="w-full py-3 border border-slate-200 rounded-xl text-slate-700 hover:bg-slate-50 transition-colors duration-300 flex items-center justify-center space-x-2">
               <Globe className="w-4 h-4" />
               <span>切換語言 (繁中)</span>
             </button>
