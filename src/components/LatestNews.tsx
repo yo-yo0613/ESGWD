@@ -7,7 +7,6 @@ import type { NewsArticleData } from '../data/siteInitialData';
 
 export default function LatestNews() {
   const [allNews, setAllNews] = useState<NewsArticleData[]>(initialNewsArticles);
-  const [activeTab, setActiveTab] = useState<string>('all');
   const [visibleCount, setVisibleCount] = useState<number>(6);
 
   // Dynamic Config Loading with Storage Event Sync
@@ -24,24 +23,13 @@ export default function LatestNews() {
     return () => window.removeEventListener('storage', fetchConfig);
   }, []);
 
-  const tabs = [
-    { id: 'all', name: '全部消息' },
-    { id: 'enterprise', name: '企業論壇' },
-    { id: 'education', name: '學童教育' },
-    { id: 'concert', name: '音樂會' }
-  ];
-
   const handleLoadMore = () => {
     setVisibleCount((prev) => Math.min(prev + 3, allNews.length));
   };
 
   const hasMore = visibleCount < allNews.length;
 
-  // Slice visible news and then apply filter to match original behavior
   const visibleNews = allNews.slice(0, visibleCount);
-  const filteredNews = activeTab === 'all'
-    ? visibleNews
-    : visibleNews.filter(item => item.category === activeTab);
 
   return (
     <section className="py-24 bg-white text-slate-800 relative">
@@ -56,30 +44,6 @@ export default function LatestNews() {
               最新消息與動態
             </h2>
           </div>
-          
-          {/* Tabs - Glassmorphism style */}
-          <div className="flex flex-wrap gap-2 p-1.5 bg-slate-100 border border-slate-200/80 rounded-xl max-w-max">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`relative px-5 py-2.5 rounded-lg text-sm font-medium tracking-wide transition-all duration-300 ${
-                  activeTab === tab.id 
-                    ? 'text-white font-bold' 
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                {activeTab === tab.id && (
-                  <motion.span
-                    layoutId="activeTabIndicator"
-                    className="absolute inset-0 bg-gradient-to-r from-brand-amber to-brand-orange rounded-lg -z-0"
-                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                  />
-                )}
-                <span className="relative z-10">{tab.name}</span>
-              </button>
-            ))}
-          </div>
         </div>
 
         {/* Cards Grid */}
@@ -88,7 +52,7 @@ export default function LatestNews() {
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16"
         >
           <AnimatePresence mode="popLayout">
-            {filteredNews.map((item) => (
+            {visibleNews.map((item) => (
               <motion.article
                 layout
                 key={item.id}

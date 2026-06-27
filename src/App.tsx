@@ -4,12 +4,25 @@ import Navbar from './components/Navbar';
 import HeroSlider from './components/HeroSlider';
 import CoreProjects from './components/CoreProjects';
 import LatestNews from './components/LatestNews';
-import Sponsors from './components/Sponsors';
 import BookCTA from './components/BookCTA';
 import DonationCTA from './components/DonationCTA';
 import Footer from './components/Footer';
 import AdminPanel from './components/AdminPanel';
 import { supabase } from './utils/supabaseClient';
+
+// Sub-pages Imports
+import AboutAssociation from './pages/AboutAssociation';
+import AboutBoard from './pages/AboutBoard';
+import AboutTeam from './pages/AboutTeam';
+import AboutDisclosures from './pages/AboutDisclosures';
+import FutureAcademy from './pages/FutureAcademy';
+import GoldenConstant from './pages/GoldenConstant';
+import GoodnessLiteracy from './pages/GoodnessLiteracy';
+import AnnualConcert from './pages/AnnualConcert';
+import PublicationsPage from './pages/PublicationsPage';
+import SocialSharePage from './pages/SocialSharePage';
+import ShopPage from './pages/ShopPage';
+import DonatePage from './pages/DonatePage';
 
 function AnalyticsTracker() {
   const location = useLocation();
@@ -81,7 +94,7 @@ function MainPortal() {
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY + 120; // offset for nav height
-      const sections = ['hero', 'projects', 'news', 'sponsors', 'publications', 'donate'];
+      const sections = ['hero', 'news', 'projects', 'publications', 'donate'];
 
       for (const section of sections) {
         const el = document.getElementById(section);
@@ -117,7 +130,7 @@ function MainPortal() {
 
   return (
     <div className="min-h-screen bg-brand-navy-dark text-slate-100 flex flex-col justify-between selection:bg-brand-amber selection:text-brand-navy">
-      <Navbar activeSection={activeSection} onNavigate={handleNavigate} />
+      <Navbar activeSection={activeSection} />
       
       <main className="flex-grow">
         {/* Hero Slider Section */}
@@ -125,19 +138,14 @@ function MainPortal() {
           <HeroSlider onCtaClick={handleNavigate} />
         </section>
 
-        {/* Storytelling & Core Projects Section */}
-        <section id="projects" className="w-full">
-          <CoreProjects onCtaClick={handleNavigate} />
-        </section>
-
         {/* Latest News & Tabs Filter Section */}
         <section id="news" className="w-full">
           <LatestNews />
         </section>
 
-        {/* Sponsors Infinite Scroll Marquee & Winners Grid */}
-        <section id="sponsors" className="w-full">
-          <Sponsors />
+        {/* Storytelling & Core Projects Section */}
+        <section id="projects" className="w-full">
+          <CoreProjects onCtaClick={handleNavigate} />
         </section>
 
         {/* Ebook Publication 3D Mockup CTA Section */}
@@ -164,6 +172,28 @@ export default function App() {
         {/* Main Portal Landing Page */}
         <Route path="/" element={<MainPortal />} />
         
+        {/* 關於我們 */}
+        <Route path="/about/association" element={<AboutAssociation />} />
+        <Route path="/about/board" element={<AboutBoard />} />
+        <Route path="/about/team" element={<AboutTeam />} />
+        <Route path="/about/disclosures" element={<AboutDisclosures />} />
+
+        {/* 服務專案 */}
+        <Route path="/projects/future-academy" element={<FutureAcademy />} />
+        <Route path="/projects/golden-constant" element={<GoldenConstant />} />
+        <Route path="/projects/goodness-literacy" element={<GoodnessLiteracy />} />
+        <Route path="/projects/concert" element={<AnnualConcert />} />
+
+        {/* 出版品 */}
+        <Route path="/publications" element={<PublicationsPage />} />
+
+        {/* 社群分享 */}
+        <Route path="/social" element={<SocialSharePage />} />
+
+        {/* 商店與支持我們（隱藏） */}
+        <Route path="/shop" element={<ShopPage />} />
+        <Route path="/donate" element={<DonatePage />} />
+
         {/* Admin Panel CMS Page */}
         <Route path="/admin" element={<AdminPanel />} />
         
