@@ -4,7 +4,7 @@
 
 ---
 
-## 🛠️ 技術架構 (Technical Stack)
+## 🛠️ 技術架喚 (Technical Stack)
 
 *   **前端網頁框架**：React 19 + TypeScript
 *   **建置與打包工具**：Vite 8 (Rolldown 編譯引擎)
@@ -28,6 +28,8 @@
 │   └── index.css         # 全域樣式設定
 ├── public/               # 靜態資源 (圖示、檔案)
 ├── package.json          # 套件依賴與腳本設定
+├── Dockerfile            # Docker 建置設定檔
+├── nginx.conf            # Nginx 網頁伺服器路由設定檔
 └── README.md             # 本說明文件
 ```
 
@@ -68,3 +70,28 @@ npm run dev
 npm run build
 ```
 編譯完成後，會在根目錄產生一個 `dist` 資料夾，裡面即是打包好的 HTML、CSS 與 JavaScript 靜態檔案。
+
+---
+
+## 🐳 Docker 容器化部署指南 (Docker Deployment)
+
+本專案已配置好 `Dockerfile` 與 `nginx.conf`，支援使用 Docker 容器化運行，確保跨平台環境一致。
+
+### 1. 建置 Docker 映像檔
+在專案根目錄下，執行以下指令建立 Docker Image：
+```bash
+docker build -t esgwd-web .
+```
+
+### 2. 啟動 Docker 容器
+建置完成後，將映像檔運行在本地的 `8080` 連接埠上：
+```bash
+docker run -d -p 8080:80 --name esgwd-site esgwd-web
+```
+啟動後，直接在瀏覽器開啟 `http://localhost:8080/` 即可瀏覽網站。
+
+### 3. 停止與刪除容器
+```bash
+docker stop esgwd-site
+docker rm esgwd-site
+```
