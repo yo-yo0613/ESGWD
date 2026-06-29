@@ -73,11 +73,13 @@ export default function Navbar({ activeSection }: NavbarProps) {
                   <span>關於我們</span>
                   <ChevronDown className="w-3.5 h-3.5 transition-transform duration-300 group-hover:rotate-180" />
                 </button>
-                <div className="absolute left-0 mt-2 w-48 bg-white border border-slate-100 rounded-2xl shadow-xl py-2 hidden group-hover:block z-50">
-                  <a href="/about/association" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">本會介紹</a>
-                  <a href="/about/board" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">董事會介紹</a>
-                  <a href="/about/team" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">團隊夥伴</a>
-                  <a href="/about/disclosures" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">公開資訊</a>
+                <div className="absolute left-0 top-full pt-2 hidden group-hover:block z-50">
+                  <div className="w-48 bg-white border border-slate-100 rounded-2xl shadow-xl py-2">
+                    <a href="/about/association" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">本會介紹</a>
+                    <a href="/about/board" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">董事會介紹</a>
+                    <a href="/about/team" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">團隊夥伴</a>
+                    <a href="/about/disclosures" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">公開資訊</a>
+                  </div>
                 </div>
               </div>
 
@@ -97,11 +99,13 @@ export default function Navbar({ activeSection }: NavbarProps) {
                   <span>服務專案</span>
                   <ChevronDown className="w-3.5 h-3.5 transition-transform duration-300 group-hover:rotate-180" />
                 </button>
-                <div className="absolute left-0 mt-2 w-52 bg-white border border-slate-100 rounded-2xl shadow-xl py-2 hidden group-hover:block z-50">
-                  <a href="/projects/future-academy" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">未來學院</a>
-                  <a href="/projects/golden-constant" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">金恆獎</a>
-                  <a href="/projects/goodness-literacy" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">良善素養教育</a>
-                  <a href="/projects/concert" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">世界公民年度音樂會</a>
+                <div className="absolute left-0 top-full pt-2 hidden group-hover:block z-50">
+                  <div className="w-52 bg-white border border-slate-100 rounded-2xl shadow-xl py-2">
+                    <a href="/projects/future-academy" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">未來學院</a>
+                    <a href="/projects/golden-constant" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">金恆獎</a>
+                    <a href="/projects/goodness-literacy" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">良善素養教育</a>
+                    <a href="/projects/concert" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">世界公民年度音樂會</a>
+                  </div>
                 </div>
               </div>
 
