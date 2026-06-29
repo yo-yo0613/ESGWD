@@ -29,10 +29,10 @@ export default function Navbar({ activeSection }: NavbarProps) {
 
   const logoTitleClass = showSolidNav 
     ? 'text-slate-800' 
-    : 'text-slate-800 lg:text-white';
+    : 'text-white';
   const logoSubClass = showSolidNav 
     ? 'text-slate-400' 
-    : 'text-slate-400 lg:text-white/50';
+    : 'text-white/50';
 
   const linkColorClass = showSolidNav
     ? 'text-slate-600 hover:text-slate-900'
@@ -150,7 +150,9 @@ export default function Navbar({ activeSection }: NavbarProps) {
           <div className="lg:hidden flex items-center space-x-4 shrink-0">
             <button 
               onClick={() => setIsOpen(!isOpen)}
-              className="text-slate-700 hover:text-brand-orange transition-colors duration-300"
+              className={`transition-colors duration-300 ${
+                showSolidNav ? 'text-slate-700 hover:text-brand-orange' : 'text-white hover:text-brand-orange'
+              }`}
             >
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
