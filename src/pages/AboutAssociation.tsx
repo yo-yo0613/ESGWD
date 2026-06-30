@@ -18,13 +18,13 @@ export default function AboutAssociation() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
             <h2 className="text-xl md:text-2xl font-bold text-slate-800">
-              致力於推廣環境、社會與治理 (ESG) 的全球發展與教育，建立永續共存的綠色未來。
+              致力於推廣環境、社會與治理 (ESG) 的全球發展與數位治理教育，建立永續發展與誠信治理的共榮未來。
             </h2>
             <p className="text-slate-600 leading-relaxed text-sm">
-              世界公民文化基金會成立於 2005 年，以「培養具備全球視野與社會責任感的世界公民」為宗旨。我們深信，面對全球氣候變遷與資源耗竭的挑戰，每一個人都應具備守護地球、關懷社會的素養。
+              ESG世界公民數位治理基金會（ESG World Citizens & Digital Governance Foundation，簡稱 ESGWD）成立於 2021 年，由董事長陳春山教授領導。我們以「推動企業雙軸轉型（數位轉型與 ESG）、全球公民意識以及數位治理」為宗旨。
             </p>
             <p className="text-slate-600 leading-relaxed text-sm">
-              近年來，我們全力投入於環境保護、社會責任及組織治理（ESG）的教育與實踐。透過倡議、大型論壇、跨界專案以及公益活動，將永續發展理念深植於企業、校園與社區中。
+              我們深信，在全球化與科技高度演進的挑戰下，企業與個人均應擁抱世界公民價值觀。我們積極透過培育大專與中小學之世界公民素養教育、開設董事會與公司治理進修課程、以及主辦雙軸轉型金恆獎，為社會發揮正向影響力。
             </p>
           </div>
           <div className="aspect-[4/3] rounded-2xl bg-gradient-to-tr from-brand-amber/10 to-brand-orange/20 border border-slate-200 flex items-center justify-center p-8 relative overflow-hidden shadow-inner">

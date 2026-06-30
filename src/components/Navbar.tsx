@@ -56,10 +56,10 @@ export default function Navbar({ activeSection }: NavbarProps) {
             </div>
             <div className="min-w-0">
               <span className={`font-heading font-bold text-base sm:text-lg tracking-wider block leading-none transition-colors duration-300 whitespace-nowrap ${logoTitleClass}`}>
-                世界公民基金會
+                世界公民數位治理基金會
               </span>
               <span className={`text-[9px] sm:text-[10px] tracking-widest uppercase mt-1 block transition-colors duration-300 whitespace-nowrap ${logoSubClass}`}>
-                World Citizen Foundation
+                World Citizens & Digital Governance
               </span>
             </div>
           </div>

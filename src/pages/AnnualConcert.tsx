@@ -63,7 +63,7 @@ export default function AnnualConcert() {
               用音樂傳遞愛與永續的能量，融化人心，串聯希望。
             </h2>
             <p className="text-slate-600 leading-relaxed text-sm">
-              世界公民基金會每年定期舉辦年度慈善音樂會，邀請國內外頂尖樂團與藝術家共襄盛舉。音樂會扣除製作成本後的所得，皆投入良善教育、環境永續等公益專案，以音樂化作實質的社會變革行動。
+              世界公民數位治理基金會每年定期舉辦年度慈善音樂會，邀請國內外頂尖樂團與藝術家共襄盛舉。音樂會扣除製作成本後的所得，皆投入良善教育、環境永續等公益專案，以音樂化作實質的社會變革行動。
             </p>
           </div>
           <div className="p-6 rounded-2xl bg-slate-100 border border-slate-200 text-center space-y-2">

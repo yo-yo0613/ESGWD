@@ -3,16 +3,16 @@ import SubPageLayout from '../components/SubPageLayout';
 export default function PublicationsPage() {
   const books = [
     {
-      title: '《AI FOR GOOD》',
-      subtitle: '人工智慧與社會共融的實踐路徑',
-      desc: '本書深入探討人工智慧（AI）技術如何運用於氣候行動、環境監測、偏鄉教育與永續能源分配。結合多個國內外標竿企業案例，提供可落實的 ESG 數位轉型指南。',
-      fileSize: '4.8 MB',
+      title: '《AI for Good 落地力》',
+      subtitle: '陳春山教授 著 ‧ 數位治理與 ESG 雙軸轉型指南',
+      desc: '本書深入探討企業如何導入 AI 技術以落實數位轉型與 ESG 永續的「雙軸轉型」。結合多個產業標竿案例，為董監事及高階主管提供最具落實價值的治理指南。',
+      fileSize: '5.2 MB',
       pdfUrl: '#',
     },
     {
       title: '《世界公民基本法的探索》',
-      subtitle: '全球公民素養與環境倫理之法律基石',
-      desc: '從環境法、國際人權與永續發展準則出發，系統性梳理世界公民應具備之基本法學素養與道德義務，是推展綠色環境倫理與校園民主的重要參考教材。',
+      subtitle: '陳春山教授 著 ‧ 全球公民素養之基石',
+      desc: '從國際法規、永續發展準則與環境倫理出發，梳理現代公民應具備之基本素養與道德責任，是推展綠色環境倫理教育的重要參考著作。',
       fileSize: '3.6 MB',
       pdfUrl: '#',
     }

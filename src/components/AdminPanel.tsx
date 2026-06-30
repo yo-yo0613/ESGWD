@@ -778,7 +778,7 @@ export default function AdminPanel() {
             </div>
             <div>
               <span className="font-heading font-bold text-sm text-white tracking-wider block leading-none">
-                世界公民基金會
+                世界公民數位治理基金會
               </span>
               <span className="text-[9px] text-white/40 tracking-widest uppercase mt-1 block">
                 Full CMS Panel

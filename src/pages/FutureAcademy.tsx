@@ -32,12 +32,28 @@ export default function FutureAcademy() {
         </div>
 
         {/* Content Block */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-3">
+            <span className="text-2xl">⚖️</span>
+            <h3 className="text-sm font-bold text-slate-800">董監事及公司治理主管認證課程</h3>
+            <p className="text-slate-500 text-xs leading-relaxed">
+              提供符合證交所認可之董監事及公司治理主管進修學分課程。內容涵蓋 ESG 永續治理策略、雙軸轉型（數位與永續）、AI 倫理治理、法遵管理及營業秘密保護。
+            </p>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-3">
+            <span className="text-2xl">🏢</span>
+            <h3 className="text-sm font-bold text-slate-800">企業客製化到府授課</h3>
+            <p className="text-slate-500 text-xs leading-relaxed">
+              針對企業特定治理痛點或發展策略，由基金會專家學者到府客製化授課，協助公司高階團隊建立一致的永續與數位雙軸思維。
+            </p>
+          </div>
+
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-3">
             <span className="text-2xl">🌱</span>
             <h3 className="text-sm font-bold text-slate-800">氣候變遷與減碳工作坊</h3>
             <p className="text-slate-500 text-xs leading-relaxed">
-              專為企業與大專院校量身規劃的碳足跡盤查與減碳路徑規劃實戰課程，以實際案例出發，培育第一線低碳永續專案執行人才。
+              規劃碳足跡盤查與減碳路徑規劃實戰課程，以實際案例出發，協助企業中階幹部與第一線執行人員對接國際碳稅與永續供應鏈標準。
             </p>
           </div>
 
@@ -45,15 +61,7 @@ export default function FutureAcademy() {
             <span className="text-2xl">🌍</span>
             <h3 className="text-sm font-bold text-slate-800">世界公民永續論壇</h3>
             <p className="text-slate-500 text-xs leading-relaxed">
-              每年定期舉辦國際青年論壇，邀請產官學專家探討 ESG 實踐挑戰，提供青年與領袖面對面對話、建構國際永續網絡的平台。
-            </p>
-          </div>
-
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-3">
-            <span className="text-2xl">🎨</span>
-            <h3 className="text-sm font-bold text-slate-800">永續綠色設計思考</h3>
-            <p className="text-slate-500 text-xs leading-relaxed">
-              融入設計思考（Design Thinking），輔導學員探索校園與社區的永續痛點，從循環經濟、低碳科技出發提出實體解決方案。
+              每年定期舉辦國際青年與企業領袖永續論壇，邀請產官學專家共同探討 ESG 實踐挑戰，提供青年與領袖面對面交流及建構國際網絡的平台。
             </p>
           </div>
         </div>

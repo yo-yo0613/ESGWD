@@ -14,7 +14,7 @@ export default function SocialSharePage() {
     {
       platform: 'facebook',
       date: '2026-06-25',
-      author: '世界公民基金會 World Citizen Foundation',
+      author: '世界公民數位治理基金會 World Citizens & Digital Governance',
       content: '【2026 金恆獎得獎企業名單揭曉】恭喜所有在誠信治理、環境永續取得卓越成就的典範企業！評審報告與頒獎典禮精采剪影已發布於官方網站，讓我們攜手並進，邁向淨零未來！🌱💪',
       img: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=600&auto=format&fit=crop',
       likes: 148

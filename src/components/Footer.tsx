@@ -25,10 +25,10 @@ export default function Footer({ onNavigate }: FooterProps) {
             </div>
             <div>
               <span className="font-heading font-bold text-lg text-white tracking-wider block leading-none">
-                世界公民基金會
+                世界公民數位治理基金會
               </span>
               <span className="text-[9px] text-slate-400 tracking-widest uppercase mt-1 block">
-                World Citizen Foundation
+                World Citizens & Digital Governance
               </span>
             </div>
           </div>
@@ -76,15 +76,15 @@ export default function Footer({ onNavigate }: FooterProps) {
           <ul className="space-y-3 text-sm">
             <li className="flex items-start space-x-3">
               <MapPin className="w-4 h-4 text-brand-amber shrink-0 mt-1" />
-              <span>台北市中正區重慶南路一段 100 號 8 樓</span>
+              <span>台北市南港區園區街 3-2 號 10 樓 (南港軟體園區)</span>
             </li>
             <li className="flex items-center space-x-3">
               <Phone className="w-4 h-4 text-brand-amber shrink-0" />
-              <span>+886-2-2345-6789</span>
+              <span>+886-2-2655-0000 (代表號)</span>
             </li>
             <li className="flex items-center space-x-3">
               <Mail className="w-4 h-4 text-brand-amber shrink-0" />
-              <span>contact@worldcitizen.org.tw</span>
+              <span>contact@esgwd.org</span>
             </li>
           </ul>
         </div>
@@ -108,7 +108,7 @@ export default function Footer({ onNavigate }: FooterProps) {
       {/* Bottom Bar */}
       <div className="max-w-7xl mx-auto px-6 md:px-12 border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-slate-500 space-y-4 md:space-y-0">
         <div>
-          © {new Date().getFullYear()} 世界公民基金會 World Citizen Foundation. All Rights Reserved.
+          © {new Date().getFullYear()} 世界公民數位治理基金會 World Citizens & Digital Governance. All Rights Reserved.
         </div>
         <div className="flex items-center space-x-1">
           <span>用愛與智慧</span>

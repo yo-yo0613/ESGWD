@@ -111,10 +111,10 @@ export default function BookCTA() {
                 {/* Cover Footer */}
                 <div className="text-center mb-6 z-10">
                   <p className="text-[10px] text-brand-amber tracking-wide">
-                    世界公民基金會 著
+                    陳春山教授 著
                   </p>
                   <span className="text-[8px] text-white/30 tracking-widest block uppercase mt-1">
-                    World Citizen Foundation
+                    World Citizens & Digital Governance
                   </span>
                 </div>
 

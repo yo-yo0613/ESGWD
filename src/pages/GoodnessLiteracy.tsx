@@ -57,7 +57,7 @@ export default function GoodnessLiteracy() {
             <div className="space-y-4 animate-fade-in">
               <h2 className="text-lg font-black text-slate-800">良善素養教育計畫 介紹</h2>
               <p className="text-slate-600 text-xs leading-relaxed">
-                良善素養教育的核心在於啟發學童與青少年的同理心、正向信念與社會責任感。我們設計了一套適合國民小學與國中的素養教材，透過探討人我關係、環境共生與社會公益，引導學子在日常生活中養成主動關懷他人的習慣。
+                良善素養教育的核心在於啟發學童與青少年的同理心、正向信念與社會責任感。本基金會積極推動「百萬學童：世界公民素養教育計畫」，舉辦「心良善・新校園講座」，融入社會情緒學習（SEL），引導學子在日常生活中養成主動關懷他人的習慣。
               </p>
               <p className="text-slate-600 text-xs leading-relaxed">
                 本計畫目前已與全台數十所小學建立緊密合作，推動融入式教學，提供師資培訓與教材研發支持，為孩子的品格成長與公民素養打下堅實基礎。
@@ -74,13 +74,13 @@ export default function GoodnessLiteracy() {
             <div className="space-y-4 animate-fade-in">
               <h2 className="text-lg font-black text-slate-800">良善世界公民專案計畫 介紹</h2>
               <p className="text-slate-600 text-xs leading-relaxed">
-                「良善世界公民專案」是一個讓孩子動手實踐社會責任的平台。我們鼓勵學童組成小團隊，發掘身邊或社區中需要被改善的社會與環境痛點（例如：關懷獨居長者、減廢行動、社區綠化等），並自主策劃行動方案。
+                「良善世界公民專案」是一個讓孩子動手實踐社會責任的平台。我們在校園推動「良善卡活動」，結合社會情緒學習（SEL）課程，鼓勵學童組成小團隊，發掘身邊或社區中需要被改善的社會與環境痛點（例如：關懷長者、垃圾減量、社區綠化等），並自主策劃行動方案。
               </p>
               <p className="text-slate-600 text-xs leading-relaxed">
-                透過「做中學」的過程，讓孩子們體驗自己也有改變世界的力量，將同理心與良善理念真正落實為解決實際問題的公民行動。
+                透過「做中學」與實地實踐的過程，讓孩子們體驗自己也有改變世界的力量，將同理心與良善理念真正落實為解決實際問題的公民行動。
               </p>
               <div className="pt-4 border-t border-slate-100 flex flex-wrap gap-4 text-[10px] text-slate-400 font-bold">
-                <span>🌍 專案指標：社會責任感實踐</span>
+                <span>🌍 專案指標：社會責任感與品格實踐</span>
                 <span>‧</span>
                 <span>💡 累積行動方案：120+ 件</span>
               </div>
