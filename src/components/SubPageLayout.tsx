@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import FloatingContact from './FloatingContact';
 
 interface SubPageLayoutProps {
   children: React.ReactNode;
@@ -26,6 +27,7 @@ export default function SubPageLayout({ children }: SubPageLayoutProps) {
         </div>
       </main>
       <Footer onNavigate={handleNavigate} />
+      <FloatingContact />
     </div>
   );
 }

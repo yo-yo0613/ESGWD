@@ -19,18 +19,12 @@ export default function Footer({ onNavigate }: FooterProps) {
       <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
         {/* Brand Info */}
         <div className="space-y-4">
-          <div className="flex items-center space-x-3 cursor-pointer group" onClick={() => onNavigate('hero')}>
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-tr from-brand-orange to-brand-amber flex items-center justify-center font-bold text-white shadow-md">
-              ESG
-            </div>
-            <div>
-              <span className="font-heading font-bold text-lg text-white tracking-wider block leading-none">
-                世界公民數位治理基金會
-              </span>
-              <span className="text-[9px] text-slate-400 tracking-widest uppercase mt-1 block">
-                World Citizens & Digital Governance
-              </span>
-            </div>
+          <div className="flex items-center cursor-pointer group py-1" onClick={() => onNavigate('hero')}>
+            <img 
+              src="/logo-footer.png" 
+              alt="ESG世界公民數位治理基金會 Logo" 
+              className="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
+            />
           </div>
           <p className="text-sm text-slate-400 leading-relaxed pt-2">
             致力於推動世界公民素養教育、永續發展與科技雙軸轉型。深耕社會公益、良善品格與跨界藝術的完美融合，攜手企業與大眾共創綠色未來。

@@ -27,12 +27,6 @@ export default function Navbar({ activeSection }: NavbarProps) {
   };
 
 
-  const logoTitleClass = showSolidNav 
-    ? 'text-slate-800' 
-    : 'text-white';
-  const logoSubClass = showSolidNav 
-    ? 'text-slate-400' 
-    : 'text-white/50';
 
   const linkColorClass = showSolidNav
     ? 'text-slate-600 hover:text-slate-900'
@@ -49,19 +43,13 @@ export default function Navbar({ activeSection }: NavbarProps) {
           {/* Logo */}
           <div 
             onClick={handleLogoClick} 
-            className="flex items-center space-x-3 cursor-pointer group shrink-0"
+            className="flex items-center cursor-pointer group shrink-0 py-1"
           >
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-tr from-brand-orange to-brand-amber flex items-center justify-center font-bold text-white shadow-md shadow-brand-orange/20 group-hover:scale-105 transition-transform duration-300 shrink-0">
-              ESG
-            </div>
-            <div className="min-w-0">
-              <span className={`font-heading font-bold text-base sm:text-lg tracking-wider block leading-none transition-colors duration-300 whitespace-nowrap ${logoTitleClass}`}>
-                世界公民數位治理基金會
-              </span>
-              <span className={`text-[9px] sm:text-[10px] tracking-widest uppercase mt-1 block transition-colors duration-300 whitespace-nowrap ${logoSubClass}`}>
-                World Citizens & Digital Governance
-              </span>
-            </div>
+            <img 
+              src={showSolidNav ? "/logo-color.png" : "/logo-footer.png"} 
+              alt="ESG世界公民數位治理基金會 Logo" 
+              className="h-10 sm:h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
+            />
           </div>
 
           {/* Desktop Menu */}

@@ -9,6 +9,7 @@ import DonationCTA from './components/DonationCTA';
 import Footer from './components/Footer';
 import AdminPanel from './components/AdminPanel';
 import { supabase } from './utils/supabaseClient';
+import FloatingContact from './components/FloatingContact';
 
 // Sub-pages Imports
 import AboutAssociation from './pages/AboutAssociation';
@@ -160,6 +161,7 @@ function MainPortal() {
       </main>
 
       <Footer onNavigate={handleNavigate} />
+      <FloatingContact />
     </div>
   );
 }
