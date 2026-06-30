@@ -1,6 +1,20 @@
+import { useState, useEffect } from 'react';
 import SubPageLayout from '../components/SubPageLayout';
+import { loadConfig } from '../utils/configLoader';
 
 export default function AboutBoard() {
+  const [avatars, setAvatars] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    async function load() {
+      const data = await loadConfig<{ board: Record<string, string>; team: Record<string, string> }>('about_us_avatars');
+      if (data && data.board) {
+        setAvatars(data.board);
+      }
+    }
+    load();
+  }, []);
+
   const boardMembers = [
     { name: '陳春山', role: '董事長', desc: '國立臺北科技大學智慧財產權研究所專任教授，長期深耕公司治理、數位轉型及 ESG 永續倡議。' },
     { name: '陳政興', role: '副董事長', desc: '均豪精密工業股份有限公司董事長暨總經理，致力於推動半導體與高階製程設備之永續智慧製造。' },
@@ -55,9 +69,13 @@ export default function AboutBoard() {
             {boardMembers.map((member, idx) => (
               <div key={idx} className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-start space-x-4 hover:shadow-md transition-shadow duration-300">
                 <div className="w-16 h-16 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden">
-                  <svg className="w-8 h-8 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                  </svg>
+                  {avatars[member.name] ? (
+                    <img src={avatars[member.name]} alt={member.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <svg className="w-8 h-8 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                    </svg>
+                  )}
                 </div>
                 <div className="space-y-2 min-w-0">
                   <span className="inline-block px-2.5 py-0.5 rounded-lg bg-orange-100 text-brand-orange text-[10px] font-bold tracking-wide">
@@ -78,9 +96,13 @@ export default function AboutBoard() {
             {directors.map((member, idx) => (
               <div key={idx} className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-start space-x-4 hover:shadow-md transition-shadow duration-300">
                 <div className="w-14 h-14 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden">
-                  <svg className="w-7 h-7 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                  </svg>
+                  {avatars[member.name] ? (
+                    <img src={avatars[member.name]} alt={member.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <svg className="w-7 h-7 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                    </svg>
+                  )}
                 </div>
                 <div className="space-y-2 min-w-0">
                   <span className="inline-block px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-500 text-[10px] font-bold tracking-wide">
@@ -101,9 +123,13 @@ export default function AboutBoard() {
             {honoraryDirectors.map((member, idx) => (
               <div key={idx} className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-start space-x-3 hover:shadow-md transition-shadow duration-300">
                 <div className="w-12 h-12 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden">
-                  <svg className="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                  </svg>
+                  {avatars[member.name] ? (
+                    <img src={avatars[member.name]} alt={member.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <svg className="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                    </svg>
+                  )}
                 </div>
                 <div className="space-y-2 min-w-0">
                   <span className="inline-block px-2.5 py-0.5 rounded-lg bg-blue-50 text-blue-600 text-[10px] font-bold tracking-wide">

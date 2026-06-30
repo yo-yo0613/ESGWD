@@ -34,7 +34,8 @@ import {
   Shield,
   PlusCircle,
   BarChart3,
-  TrendingUp
+  TrendingUp,
+  Users
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -59,10 +60,16 @@ interface VisitorLog {
   created_at: string;
 }
 
+interface AboutUsAvatars {
+  board: Record<string, string>;
+  team: Record<string, string>;
+}
+
 export default function AdminPanel() {
+  const [aboutAvatars, setAboutAvatars] = useState<AboutUsAvatars>({ board: {}, team: {} });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState<
-    'dashboard' | 'bento' | 'hero' | 'projects' | 'news' | 'partners' | 'ebook_donation' | 'analytics' | 'settings'
+    'dashboard' | 'bento' | 'hero' | 'projects' | 'news' | 'partners' | 'ebook_donation' | 'analytics' | 'settings' | 'about_us'
   >('dashboard');
   
   const [visitorLogs, setVisitorLogs] = useState<VisitorLog[]>([]);
@@ -247,6 +254,9 @@ export default function AdminPanel() {
 
     const lsu = await loadConfig<string>('looker_studio_url');
     if (lsu) setLookerStudioUrl(lsu);
+
+    const avatars = await loadConfig<AboutUsAvatars>('about_us_avatars');
+    if (avatars) setAboutAvatars(avatars);
   };
 
   const fetchVisitorLogs = async () => {
@@ -853,6 +863,16 @@ export default function AdminPanel() {
             </button>
 
             <button
+              onClick={() => setActiveTab('about_us')}
+              className={`w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all duration-300 ${
+                activeTab === 'about_us' ? 'bg-blue-600 text-white shadow-md' : 'text-white/70 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <Users className="w-4 h-4 text-pink-400" />
+              <span>關於與團隊管理</span>
+            </button>
+
+            <button
               onClick={() => setActiveTab('partners')}
               className={`w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all duration-300 ${
                 activeTab === 'partners' ? 'bg-blue-600 text-white shadow-md' : 'text-white/70 hover:text-white hover:bg-white/5'
@@ -922,6 +942,7 @@ export default function AdminPanel() {
               {activeTab === 'hero' && 'Hero 輪播管理 (Hero Slider CMS)'}
               {activeTab === 'projects' && '核心專案與指標管理 (Core Projects CMS)'}
               {activeTab === 'news' && '最新消息管理 (Latest News CMS)'}
+              {activeTab === 'about_us' && '關於我們與團隊管理 (About & Team CMS)'}
               {activeTab === 'partners' && '贊助商牆與金恆獎管理 (Partners & Awards CMS)'}
               {activeTab === 'ebook_donation' && '電子書與捐款管理 (Ebook & Donations)'}
               {activeTab === 'analytics' && '流量數據分析 (Traffic Analytics)'}
@@ -2172,6 +2193,171 @@ export default function AdminPanel() {
                     前往 Vercel 控制台 &rarr;
                   </a>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* 7. ABOUT & TEAM VIEW */}
+          {activeTab === 'about_us' && (
+            <div className="space-y-8 animate-fade-in max-w-4xl mx-auto my-6">
+              <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm space-y-6">
+                <h3 className="text-sm font-extrabold text-slate-800 tracking-wide border-b border-slate-100 pb-3 flex items-center space-x-2">
+                  <Users className="w-4 h-4 text-pink-500" />
+                  <span>常務董事會成員頭像管理</span>
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {['陳春山', '陳政興'].map((name) => (
+                    <div key={name} className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-slate-700">{name} (常務董事)</span>
+                        {aboutAvatars.board[name] && (
+                          <button
+                            onClick={() => {
+                              const updated = { ...aboutAvatars };
+                              delete updated.board[name];
+                              setAboutAvatars(updated);
+                            }}
+                            className="text-[10px] text-red-500 hover:underline"
+                          >
+                            移除頭像
+                          </button>
+                        )}
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <div className="w-12 h-12 rounded-full bg-slate-200 border border-slate-300 overflow-hidden flex items-center justify-center shrink-0">
+                          {aboutAvatars.board[name] ? (
+                            <img src={aboutAvatars.board[name]} className="w-full h-full object-cover" />
+                          ) : (
+                            <svg className="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </div>
+                        <div className="flex-grow space-y-2">
+                          <input
+                            type="text"
+                            placeholder="貼上頭像圖片 URL..."
+                            value={aboutAvatars.board[name] || ''}
+                            onChange={(e) => {
+                              const updated = { ...aboutAvatars };
+                              updated.board[name] = e.target.value;
+                              setAboutAvatars(updated);
+                            }}
+                            className="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-[11px] focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={async (e) => {
+                              if (!e.target.files || e.target.files.length === 0) return;
+                              const file = e.target.files[0];
+                              const url = await uploadToCloudinary(file);
+                              if (url) {
+                                const updated = { ...aboutAvatars };
+                                updated.board[name] = url;
+                                setAboutAvatars(updated);
+                                alert('✨ 董事頭像上傳成功！');
+                              } else {
+                                alert('上傳失敗，請檢查網路或 Cloudinary');
+                              }
+                            }}
+                            className="text-[10px] text-slate-500 block file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-[10px] file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm space-y-6">
+                <h3 className="text-sm font-extrabold text-slate-800 tracking-wide border-b border-slate-100 pb-3 flex items-center space-x-2">
+                  <Users className="w-4 h-4 text-orange-500" />
+                  <span>團隊夥伴成員頭像管理</span>
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {['林筠騏', '許玉青', '駱怡雯', '黃慧欣'].map((name) => (
+                    <div key={name} className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-slate-700">{name} (團隊成員)</span>
+                        {aboutAvatars.team[name] && (
+                          <button
+                            onClick={() => {
+                              const updated = { ...aboutAvatars };
+                              delete updated.team[name];
+                              setAboutAvatars(updated);
+                            }}
+                            className="text-[10px] text-red-500 hover:underline"
+                          >
+                            移除頭像
+                          </button>
+                        )}
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <div className="w-12 h-12 rounded-full bg-slate-200 border border-slate-300 overflow-hidden flex items-center justify-center shrink-0">
+                          {aboutAvatars.team[name] ? (
+                            <img src={aboutAvatars.team[name]} className="w-full h-full object-cover" />
+                          ) : (
+                            <svg className="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </div>
+                        <div className="flex-grow space-y-2">
+                          <input
+                            type="text"
+                            placeholder="貼上頭像圖片 URL..."
+                            value={aboutAvatars.team[name] || ''}
+                            onChange={(e) => {
+                              const updated = { ...aboutAvatars };
+                              updated.team[name] = e.target.value;
+                              setAboutAvatars(updated);
+                            }}
+                            className="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-[11px] focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={async (e) => {
+                              if (!e.target.files || e.target.files.length === 0) return;
+                              const file = e.target.files[0];
+                              const url = await uploadToCloudinary(file);
+                              if (url) {
+                                const updated = { ...aboutAvatars };
+                                updated.team[name] = url;
+                                setAboutAvatars(updated);
+                                alert('✨ 團隊夥伴頭像上傳成功！');
+                              } else {
+                                alert('上傳失敗，請檢查網路或 Cloudinary');
+                              }
+                            }}
+                            className="text-[10px] text-slate-500 block file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-[10px] file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm flex items-center justify-between">
+                <div className="space-y-1">
+                  <h4 className="text-xs font-extrabold text-slate-800">確認保存變更</h4>
+                  <p className="text-[10px] text-slate-400">變更將即時同步到 Supabase 資料庫，並呈現在「董事會介紹」與「團隊夥伴」頁面。</p>
+                </div>
+                <button
+                  onClick={async () => {
+                    try {
+                      await saveConfig('about_us_avatars', aboutAvatars);
+                      alert('✨ 董事與團隊成員頭像成功保存並同步至前台！');
+                    } catch (e) {
+                      alert('儲存失敗，請重試');
+                    }
+                  }}
+                  className="px-6 py-2.5 rounded-xl bg-pink-600 hover:bg-pink-700 text-white font-extrabold text-xs shadow-md transition-all duration-300"
+                >
+                  發布並儲存至 Supabase
+                </button>
               </div>
             </div>
           )}

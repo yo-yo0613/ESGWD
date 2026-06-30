@@ -1,6 +1,20 @@
+import { useState, useEffect } from 'react';
 import SubPageLayout from '../components/SubPageLayout';
+import { loadConfig } from '../utils/configLoader';
 
 export default function AboutTeam() {
+  const [avatars, setAvatars] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    async function load() {
+      const data = await loadConfig<{ board: Record<string, string>; team: Record<string, string> }>('about_us_avatars');
+      if (data && data.team) {
+        setAvatars(data.team);
+      }
+    }
+    load();
+  }, []);
+
   const partners = [
     {
       name: '林筠騏',
@@ -46,11 +60,15 @@ export default function AboutTeam() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {partners.map((member, idx) => (
             <div key={idx} className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col items-center text-center space-y-4 hover:shadow-md transition-shadow duration-300">
-              {/* Photo Frame with Silhouette Icon */}
+              {/* Photo Frame with Silhouette Icon / Image */}
               <div className="w-24 h-24 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden relative group">
-                <svg className="w-12 h-12 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                </svg>
+                {avatars[member.name] ? (
+                  <img src={avatars[member.name]} alt={member.name} className="w-full h-full object-cover" />
+                ) : (
+                  <svg className="w-12 h-12 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                  </svg>
+                )}
               </div>
 
               <div className="space-y-2">

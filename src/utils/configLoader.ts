@@ -17,7 +17,8 @@ export const DEFAULT_CONFIGS: Record<string, any> = {
   award_winners: initialAwardWinners,
   book_cta: initialBookCta,
   donation_plans: initialDonationPlans,
-  looker_studio_url: 'https://lookerstudio.google.com/embed/reporting/c14b43c6-31a4-4f81-9b16-43ad3750058b/page/1M'
+  looker_studio_url: 'https://lookerstudio.google.com/embed/reporting/c14b43c6-31a4-4f81-9b16-43ad3750058b/page/1M',
+  about_us_avatars: { board: {}, team: {} }
 };
 
 /**
