@@ -2269,6 +2269,145 @@ export default function AdminPanel() {
                   ))}
                 </div>
               </div>
+              <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm space-y-6">
+                <h3 className="text-sm font-extrabold text-slate-800 tracking-wide border-b border-slate-100 pb-3 flex items-center space-x-2">
+                  <Users className="w-4 h-4 text-pink-500" />
+                  <span>董事會成員頭像管理</span>
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[400px] overflow-y-auto pr-2">
+                  {['王文山', '何子明', '佘日新', '吳明賢', '周行一', '周桂田', '胡元輝', '梁又文', '楊岳虎', '陳孝昌', '陳美伶', '陳雅婕', '潘維大', '盧秋玲'].map((name) => (
+                    <div key={name} className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-slate-700">{name} (董事)</span>
+                        {aboutAvatars.board[name] && (
+                          <button
+                            onClick={() => {
+                              const updated = { ...aboutAvatars };
+                              delete updated.board[name];
+                              setAboutAvatars(updated);
+                            }}
+                            className="text-[10px] text-red-500 hover:underline"
+                          >
+                            移除頭像
+                          </button>
+                        )}
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <div className="w-12 h-12 rounded-full bg-slate-200 border border-slate-300 overflow-hidden flex items-center justify-center shrink-0">
+                          {aboutAvatars.board[name] ? (
+                            <img src={aboutAvatars.board[name]} className="w-full h-full object-cover" />
+                          ) : (
+                            <svg className="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </div>
+                        <div className="flex-grow space-y-2 min-w-0">
+                          <input
+                            type="text"
+                            placeholder="貼上頭像圖片 URL..."
+                            value={aboutAvatars.board[name] || ''}
+                            onChange={(e) => {
+                              const updated = { ...aboutAvatars };
+                              updated.board[name] = e.target.value;
+                              setAboutAvatars(updated);
+                            }}
+                            className="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-[10px] focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={async (e) => {
+                              if (!e.target.files || e.target.files.length === 0) return;
+                              const file = e.target.files[0];
+                              const url = await uploadToCloudinary(file);
+                              if (url) {
+                                const updated = { ...aboutAvatars };
+                                updated.board[name] = url;
+                                setAboutAvatars(updated);
+                                alert('✨ 董事頭像上傳成功！');
+                              } else {
+                                alert('上傳失敗，請檢查網路或 Cloudinary');
+                              }
+                            }}
+                            className="text-[9px] text-slate-500 block file:mr-1 file:py-0.5 file:px-1.5 file:rounded file:border-0 file:text-[9px] file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm space-y-6">
+                <h3 className="text-sm font-extrabold text-slate-800 tracking-wide border-b border-slate-100 pb-3 flex items-center space-x-2">
+                  <Users className="w-4 h-4 text-pink-500" />
+                  <span>榮譽董事成員頭像管理</span>
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {['陳進財', '黃士軍', '彭裕民', '王國雄'].map((name) => (
+                    <div key={name} className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-slate-700">{name} (榮譽董事)</span>
+                        {aboutAvatars.board[name] && (
+                          <button
+                            onClick={() => {
+                              const updated = { ...aboutAvatars };
+                              delete updated.board[name];
+                              setAboutAvatars(updated);
+                            }}
+                            className="text-[10px] text-red-500 hover:underline"
+                          >
+                            移除頭像
+                          </button>
+                        )}
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-10 h-10 rounded-full bg-slate-200 border border-slate-300 overflow-hidden flex items-center justify-center shrink-0">
+                          {aboutAvatars.board[name] ? (
+                            <img src={aboutAvatars.board[name]} className="w-full h-full object-cover" />
+                          ) : (
+                            <svg className="w-5 h-5 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </div>
+                        <div className="flex-grow space-y-1 min-w-0">
+                          <input
+                            type="text"
+                            placeholder="圖片 URL..."
+                            value={aboutAvatars.board[name] || ''}
+                            onChange={(e) => {
+                              const updated = { ...aboutAvatars };
+                              updated.board[name] = e.target.value;
+                              setAboutAvatars(updated);
+                            }}
+                            className="w-full px-2 py-1 rounded-lg border border-slate-200 text-[9px] focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={async (e) => {
+                              if (!e.target.files || e.target.files.length === 0) return;
+                              const file = e.target.files[0];
+                              const url = await uploadToCloudinary(file);
+                              if (url) {
+                                const updated = { ...aboutAvatars };
+                                updated.board[name] = url;
+                                setAboutAvatars(updated);
+                                alert('✨ 榮譽董事頭像上傳成功！');
+                              } else {
+                                alert('上傳失敗，請檢查網路或 Cloudinary');
+                              }
+                            }}
+                            className="text-[8px] text-slate-500 block file:mr-1 file:py-0.5 file:px-1 file:rounded file:border-0 file:text-[8px] file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div> 
 
               <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm space-y-6">
                 <h3 className="text-sm font-extrabold text-slate-800 tracking-wide border-b border-slate-100 pb-3 flex items-center space-x-2">
