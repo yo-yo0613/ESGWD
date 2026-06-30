@@ -53,13 +53,18 @@ export default function AboutBoard() {
           <h2 className="text-lg font-bold text-brand-navy border-b border-slate-100 pb-2">常務董事會</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {boardMembers.map((member, idx) => (
-              <div key={idx} className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow duration-300">
-                <div className="space-y-3">
-                  <span className="inline-block px-2.5 py-1 rounded-lg bg-orange-100 text-brand-orange text-[10px] font-bold tracking-wide">
+              <div key={idx} className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-start space-x-4 hover:shadow-md transition-shadow duration-300">
+                <div className="w-16 h-16 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden">
+                  <svg className="w-8 h-8 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="space-y-2 min-w-0">
+                  <span className="inline-block px-2.5 py-0.5 rounded-lg bg-orange-100 text-brand-orange text-[10px] font-bold tracking-wide">
                     {member.role}
                   </span>
-                  <h3 className="text-lg font-black text-slate-800">{member.name}</h3>
-                  <p className="text-slate-500 text-xs leading-relaxed">{member.desc}</p>
+                  <h3 className="text-base font-black text-slate-800 leading-none">{member.name}</h3>
+                  <p className="text-slate-500 text-xs leading-relaxed pt-1">{member.desc}</p>
                 </div>
               </div>
             ))}
@@ -71,13 +76,18 @@ export default function AboutBoard() {
           <h2 className="text-lg font-bold text-brand-navy border-b border-slate-100 pb-2">董事會成員</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {directors.map((member, idx) => (
-              <div key={idx} className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow duration-300">
-                <div className="space-y-3">
-                  <span className="inline-block px-2.5 py-1 rounded-lg bg-slate-100 text-slate-500 text-[10px] font-bold tracking-wide">
+              <div key={idx} className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-start space-x-4 hover:shadow-md transition-shadow duration-300">
+                <div className="w-14 h-14 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden">
+                  <svg className="w-7 h-7 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="space-y-2 min-w-0">
+                  <span className="inline-block px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-500 text-[10px] font-bold tracking-wide">
                     {member.role}
                   </span>
-                  <h3 className="text-lg font-black text-slate-800">{member.name}</h3>
-                  <p className="text-slate-500 text-xs leading-relaxed">{member.desc}</p>
+                  <h3 className="text-base font-black text-slate-800 leading-none">{member.name}</h3>
+                  <p className="text-slate-500 text-xs leading-relaxed pt-1">{member.desc}</p>
                 </div>
               </div>
             ))}
@@ -89,13 +99,18 @@ export default function AboutBoard() {
           <h2 className="text-lg font-bold text-brand-navy border-b border-slate-100 pb-2">榮譽董事</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {honoraryDirectors.map((member, idx) => (
-              <div key={idx} className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow duration-300">
-                <div className="space-y-3">
-                  <span className="inline-block px-2.5 py-1 rounded-lg bg-blue-50 text-blue-600 text-[10px] font-bold tracking-wide">
+              <div key={idx} className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-start space-x-3 hover:shadow-md transition-shadow duration-300">
+                <div className="w-12 h-12 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden">
+                  <svg className="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="space-y-2 min-w-0">
+                  <span className="inline-block px-2.5 py-0.5 rounded-lg bg-blue-50 text-blue-600 text-[10px] font-bold tracking-wide">
                     {member.role}
                   </span>
-                  <h3 className="text-lg font-black text-slate-800">{member.name}</h3>
-                  <p className="text-slate-500 text-xs leading-relaxed">{member.desc}</p>
+                  <h3 className="text-sm font-black text-slate-800 leading-none">{member.name}</h3>
+                  <p className="text-slate-500 text-[11px] leading-relaxed pt-1">{member.desc}</p>
                 </div>
               </div>
             ))}

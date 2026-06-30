@@ -1,11 +1,27 @@
 import SubPageLayout from '../components/SubPageLayout';
 
 export default function AboutTeam() {
-  const teams = [
-    { department: '會務行政與財務部', members: ['王麗君 (總幹事)', '張美華 (出納)', '林佳蓉 (行政助理)'] },
-    { department: 'ESG 專案推廣組', members: ['李國平 (組長)', '陳冠宇 (資深企劃專員)', '黃晴雅 (環境教育專員)'] },
-    { department: '良善素養教育推動組', members: ['廖芳儀 (組長)', '徐佩吟 (課程規劃師)', '許家豪 (校園專案助理)'] },
-    { department: '影音與社群推廣組', members: ['郭紹威 (創意總監)', '蔡羽婕 (社群行銷專員)', '簡佑廷 (影音剪輯專員)'] },
+  const partners = [
+    {
+      name: '林筠騏',
+      role: '秘書長',
+      desc: '規劃基金會核心政策、雙軸轉型策略倡議與跨界合作專案的整體規劃。',
+    },
+    {
+      name: '許玉青',
+      role: '副秘書長',
+      desc: '協助秘書長執行會務，督導環境與數位治理專案及良善教育活動之校園合作推廣。',
+    },
+    {
+      name: '駱怡雯',
+      role: '專案經理',
+      desc: '專責雙軸轉型金恆獎評審委員會溝通、企業客製化到府授課專案管理。',
+    },
+    {
+      name: '黃慧欣',
+      role: '專案專員',
+      desc: '負責基金會日常行政管理、社群推廣運營及世界公民年度音樂會等大型活動籌辦。',
+    },
   ];
 
   return (
@@ -23,23 +39,26 @@ export default function AboutTeam() {
 
         {/* Intro */}
         <p className="text-slate-600 leading-relaxed text-sm max-w-3xl">
-          我們的團隊由一群熱愛環境教育、關注社會公平與組織永續治理的專職夥伴與顧問所組成。大家發揮各自的專業，共同推動公民素養與可持續發展變革。
+          我們的團隊由一群熱愛環境教育、關注公民素養與科技治理雙軸轉型的專職夥伴組成，攜手各界共榮前進。
         </p>
 
-        {/* Team Departments */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {teams.map((t, idx) => (
-            <div key={idx} className="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm space-y-4">
-              <h3 className="text-sm font-extrabold text-brand-navy tracking-wide border-b border-slate-100 pb-3 flex items-center space-x-2">
-                <span className="w-1.5 h-3 bg-brand-orange rounded-full" />
-                <span>{t.department}</span>
-              </h3>
-              <div className="flex flex-wrap gap-2.5">
-                {t.members.map((name, memberIdx) => (
-                  <span key={memberIdx} className="px-3.5 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 bg-slate-50/50 hover:bg-slate-50 transition-colors">
-                    {name}
-                  </span>
-                ))}
+        {/* Team Members Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {partners.map((member, idx) => (
+            <div key={idx} className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col items-center text-center space-y-4 hover:shadow-md transition-shadow duration-300">
+              {/* Photo Frame with Silhouette Icon */}
+              <div className="w-24 h-24 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden relative group">
+                <svg className="w-12 h-12 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                </svg>
+              </div>
+
+              <div className="space-y-2">
+                <span className="inline-block px-2.5 py-0.5 rounded-lg bg-orange-50 text-brand-orange text-[10px] font-bold tracking-wide">
+                  {member.role}
+                </span>
+                <h3 className="text-base font-black text-slate-800 leading-none">{member.name}</h3>
+                <p className="text-slate-500 text-[11px] leading-relaxed pt-2 px-2">{member.desc}</p>
               </div>
             </div>
           ))}
