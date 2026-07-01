@@ -2203,7 +2203,7 @@ export default function AdminPanel() {
               <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm space-y-6">
                 <h3 className="text-sm font-extrabold text-slate-800 tracking-wide border-b border-slate-100 pb-3 flex items-center space-x-2">
                   <Users className="w-4 h-4 text-pink-500" />
-                  <span>常務董事會成員頭像管理</span>
+                  <span>董事會成員頭像管理</span>
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {['陳春山', '陳政興'].map((name) => (
