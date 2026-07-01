@@ -35,12 +35,14 @@ export const translations: Record<string, TranslationDict> = {
     // About Board
     'about.board.title': '董事會介紹',
     'about.board.subtitle': '認識我們的核心領導團隊',
+    'about.board.desc': '世界公民數位治理基金會由各界具備深厚學養與高度社會聲譽之領袖人物組成。董事會負責監督會務運作，確保各項 ESG 公益活動透明度與社會影響力最大化。',
     'about.board.standing': '常務董事會',
     'about.board.directors': '董事會',
     'about.board.honorary': '榮譽董事',
     // About Team
     'about.team.title': '團隊夥伴',
     'about.team.subtitle': '認識我們的執行團隊',
+    'about.team.desc': '我們的團隊由一群熱愛環境教育、關注公民素養與科技治理雙軸轉型的專職夥伴組成，攜手各界共榮前進。',
     // CMS
     'cms.name': '姓名',
     'cms.name_en': '姓名（英文）',
@@ -88,12 +90,14 @@ export const translations: Record<string, TranslationDict> = {
     // About Board
     'about.board.title': 'Board of Directors',
     'about.board.subtitle': 'Meet our core leadership team',
+    'about.board.desc': 'The ESG World Digital Governance Foundation is composed of leaders with deep academic background and high social reputation. The Board of Directors oversees operations to ensure maximum transparency and social impact of all ESG initiatives.',
     'about.board.standing': 'Standing Board',
     'about.board.directors': 'Directors',
     'about.board.honorary': 'Honorary Directors',
     // About Team
     'about.team.title': 'Our Team',
     'about.team.subtitle': 'Meet our executive team',
+    'about.team.desc': 'Our team is composed of dedicated members passionate about environmental education, civic literacy, and the twin transition of tech governance, working together with all sectors for mutual prosperity.',
     // CMS
     'cms.name': 'Name',
     'cms.name_en': 'Name (English)',

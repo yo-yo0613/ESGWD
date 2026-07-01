@@ -62,8 +62,11 @@ interface VisitorLog {
 
 interface Member {
   name: string;
+  name_en?: string;
   role: string;
+  role_en?: string;
   desc: string;
+  desc_en?: string;
   avatar: string;
 }
 
@@ -118,7 +121,9 @@ export default function AdminPanel() {
 
   // Form states for creating new items
   const [newNewsTitle, setNewNewsTitle] = useState('');
+  const [newNewsTitleEn, setNewNewsTitleEn] = useState('');
   const [newNewsSummary, setNewNewsSummary] = useState('');
+  const [newNewsSummaryEn, setNewNewsSummaryEn] = useState('');
   const [newNewsCategory, setNewNewsCategory] = useState<'enterprise' | 'education' | 'concert'>('education');
   const [newNewsImage, setNewNewsImage] = useState('');
   const [newNewsDate, setNewNewsDate] = useState('');
@@ -415,13 +420,15 @@ export default function AdminPanel() {
     e.preventDefault();
     if (!newNewsTitle.trim()) return;
 
-    const newItem: NewsArticleData = {
+    const newItem: any = {
       id: Date.now(),
       title: newNewsTitle,
+      title_en: newNewsTitleEn,
       category: newNewsCategory,
       categoryLabel: newNewsCategory === 'enterprise' ? '企業論壇' : newNewsCategory === 'education' ? '學童教育' : '音樂會',
       date: newNewsDate || new Date().toISOString().split('T')[0],
       summary: newNewsSummary,
+      summary_en: newNewsSummaryEn,
       image: newNewsImage || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=600&q=80'
     };
 
@@ -430,7 +437,9 @@ export default function AdminPanel() {
       await saveConfig('news_articles', updated);
       setNewsList(updated);
       setNewNewsTitle('');
+      setNewNewsTitleEn('');
       setNewNewsSummary('');
+      setNewNewsSummaryEn('');
       setNewNewsImage('');
       alert('✨ 最新消息文章已成功發布！');
     } catch (err) {
@@ -802,7 +811,7 @@ export default function AdminPanel() {
               const updated = { ...aboutMembers };
               updated[key] = [
                 ...updated[key],
-                { name: '新成員姓名', role: '職稱', desc: '學經歷與簡介', avatar: '' }
+                { name: '新成員姓名', name_en: 'New Member Name', role: '職稱', role_en: 'Role', desc: '學經歷與簡介', desc_en: 'Biography', avatar: '' }
               ];
               setAboutMembers(updated);
             }}
@@ -829,7 +838,7 @@ export default function AdminPanel() {
               <div className="space-y-2 text-left">
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[9px] text-slate-400 block font-bold mb-0.5">姓名</label>
+                    <label className="text-[9px] text-slate-400 block font-bold mb-0.5">姓名 (繁中)</label>
                     <input
                       type="text"
                       value={member.name}
@@ -844,7 +853,25 @@ export default function AdminPanel() {
                     />
                   </div>
                   <div>
-                    <label className="text-[9px] text-slate-400 block font-bold mb-0.5">職稱</label>
+                    <label className="text-[9px] text-slate-400 block font-bold mb-0.5">Name (English)</label>
+                    <input
+                      type="text"
+                      value={member.name_en || ''}
+                      onChange={(e) => {
+                        const updated = { ...aboutMembers };
+                        const items = [...updated[key]];
+                        items[index] = { ...items[index], name_en: e.target.value };
+                        updated[key] = items;
+                        setAboutMembers(updated);
+                      }}
+                      className="w-full px-2 py-1 rounded border border-slate-200 text-xs focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="text-[9px] text-slate-400 block font-bold mb-0.5">職稱 (繁中)</label>
                     <input
                       type="text"
                       value={member.role}
@@ -858,9 +885,25 @@ export default function AdminPanel() {
                       className="w-full px-2 py-1 rounded border border-slate-200 text-xs focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
+                  <div>
+                    <label className="text-[9px] text-slate-400 block font-bold mb-0.5">Role (English)</label>
+                    <input
+                      type="text"
+                      value={member.role_en || ''}
+                      onChange={(e) => {
+                        const updated = { ...aboutMembers };
+                        const items = [...updated[key]];
+                        items[index] = { ...items[index], role_en: e.target.value };
+                        updated[key] = items;
+                        setAboutMembers(updated);
+                      }}
+                      className="w-full px-2 py-1 rounded border border-slate-200 text-xs focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
                 </div>
+
                 <div>
-                  <label className="text-[9px] text-slate-400 block font-bold mb-0.5">簡介 (學經歷/Biograph)</label>
+                  <label className="text-[9px] text-slate-400 block font-bold mb-0.5">簡介 (繁中)</label>
                   <textarea
                     value={member.desc}
                     rows={2}
@@ -868,6 +911,22 @@ export default function AdminPanel() {
                       const updated = { ...aboutMembers };
                       const items = [...updated[key]];
                       items[index] = { ...items[index], desc: e.target.value };
+                      updated[key] = items;
+                      setAboutMembers(updated);
+                    }}
+                    className="w-full px-2 py-1 rounded border border-slate-200 text-[11px] focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[9px] text-slate-400 block font-bold mb-0.5">Biography (English)</label>
+                  <textarea
+                    value={member.desc_en || ''}
+                    rows={2}
+                    onChange={(e) => {
+                      const updated = { ...aboutMembers };
+                      const items = [...updated[key]];
+                      items[index] = { ...items[index], desc_en: e.target.value };
                       updated[key] = items;
                       setAboutMembers(updated);
                     }}
@@ -1636,8 +1695,8 @@ export default function AdminPanel() {
                   <span>發布最新消息</span>
                 </h3>
 
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-600">消息標題 *</label>
+                 <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-600">消息標題 (繁中) *</label>
                   <input
                     type="text"
                     value={newNewsTitle}
@@ -1645,6 +1704,17 @@ export default function AdminPanel() {
                     placeholder="例：2026雙軸轉型論壇即將召開"
                     className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
                     required
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-600">Title (English)</label>
+                  <input
+                    type="text"
+                    value={newNewsTitleEn}
+                    onChange={(e) => setNewNewsTitleEn(e.target.value)}
+                    placeholder="e.g. 2026 Twin-Axis Transformation Forum..."
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
                   />
                 </div>
 
@@ -1673,13 +1743,23 @@ export default function AdminPanel() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-600">摘要描述 *</label>
+                  <label className="text-xs font-bold text-slate-600">摘要描述 (繁中) *</label>
                   <textarea
                     value={newNewsSummary}
                     onChange={(e) => setNewNewsSummary(e.target.value)}
                     placeholder="消息簡介或文章摘要，建議 50-80 字..."
                     className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs h-20 resize-none focus:ring-1 focus:ring-blue-500 focus:outline-none"
                     required
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-600">Summary (English)</label>
+                  <textarea
+                    value={newNewsSummaryEn}
+                    onChange={(e) => setNewNewsSummaryEn(e.target.value)}
+                    placeholder="Article summary in English..."
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs h-20 resize-none focus:ring-1 focus:ring-blue-500 focus:outline-none"
                   />
                 </div>
 
