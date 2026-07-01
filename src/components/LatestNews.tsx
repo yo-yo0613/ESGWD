@@ -15,6 +15,7 @@ export default function LatestNews() {
   const [visibleCount, setVisibleCount] = useState<number>(6);
   const [selectedArticle, setSelectedArticle] = useState<NewsArticleData | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   const openArticle = (article: NewsArticleData) => {
     setSelectedArticle(article);
@@ -30,9 +31,13 @@ export default function LatestNews() {
   // Dynamic Config Loading with Storage Event Sync
   useEffect(() => {
     const fetchConfig = async () => {
-      const data = await loadConfig<NewsArticleData[]>('news_articles');
-      if (data && data.length > 0) {
-        setAllNews(data);
+      try {
+        const data = await loadConfig<NewsArticleData[]>('news_articles');
+        if (data && data.length > 0) {
+          setAllNews(data);
+        }
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchConfig();
@@ -64,95 +69,112 @@ export default function LatestNews() {
           </div>
         </div>
 
-        {/* Cards Grid */}
-        <motion.div 
-          layout
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16"
-        >
-          <AnimatePresence mode="popLayout">
-            {visibleNews.map((item) => (
-              <motion.article
-                layout
-                key={item.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.4 }}
-                className="group flex flex-col justify-between bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-md shadow-slate-100/50 hover:shadow-xl hover:shadow-slate-200/50 hover:border-slate-300 transition-all duration-300"
-              >
-                <div>
-                  {/* Card Image */}
-                  <div 
-                    className="relative h-52 w-full overflow-hidden cursor-pointer"
-                    onClick={() => openArticle(item)}
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[1, 2, 3].map((n) => (
+              <div key={n} className="rounded-2xl border border-slate-200 p-6 space-y-6 bg-white animate-pulse">
+                <div className="h-52 bg-slate-100 rounded-xl" />
+                <div className="space-y-3">
+                  <div className="h-4 bg-slate-100 rounded w-1/4" />
+                  <div className="h-6 bg-slate-100 rounded w-3/4" />
+                  <div className="h-4 bg-slate-100 rounded w-5/6" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <>
+            {/* Cards Grid */}
+            <motion.div 
+              layout
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16"
+            >
+              <AnimatePresence mode="popLayout">
+                {visibleNews.map((item) => (
+                  <motion.article
+                    layout
+                    key={item.id}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.4 }}
+                    className="group flex flex-col justify-between bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-md shadow-slate-100/50 hover:shadow-xl hover:shadow-slate-200/50 hover:border-slate-300 transition-all duration-300"
                   >
-                    <img 
-                      src={item.image} 
-                      alt={item.title} 
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                      loading="lazy"
-                    />
-                    {/* Dark gradient overlay on image */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-60" />
-                    
-                    {/* Badge */}
-                    <span className={`absolute top-4 left-4 text-xs font-semibold px-3 py-1.5 rounded-lg text-white backdrop-blur-md border border-white/10 ${
-                      item.category === 'enterprise' ? 'bg-amber-600/70' :
-                      item.category === 'education' ? 'bg-violet-600/70' :
-                      'bg-orange-600/70'
-                    }`}>
-                      {item.categoryLabel}
-                    </span>
-                  </div>
+                    <div>
+                      {/* Card Image */}
+                      <div 
+                        className="relative h-52 w-full overflow-hidden cursor-pointer"
+                        onClick={() => openArticle(item)}
+                      >
+                        <img 
+                          src={item.image} 
+                          alt={bi(item.title, (item as any).title_en)} 
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                          loading="lazy"
+                        />
+                        {/* Dark gradient overlay on image */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-60" />
+                        
+                        {/* Badge */}
+                        <span className={`absolute top-4 left-4 text-xs font-semibold px-3 py-1.5 rounded-lg text-white backdrop-blur-md border border-white/10 ${
+                          item.category === 'enterprise' ? 'bg-amber-600/70' :
+                          item.category === 'education' ? 'bg-violet-600/70' :
+                          'bg-orange-600/70'
+                        }`}>
+                          {item.categoryLabel}
+                        </span>
+                      </div>
 
-                  {/* Card Content */}
-                  <div className="p-6 md:p-8 space-y-4">
-                    {/* Date */}
-                    <div className="flex items-center space-x-2 text-xs text-slate-400">
-                      <Calendar className="w-3.5 h-3.5" />
-                      <time dateTime={item.date}>{item.date}</time>
+                      {/* Card Content */}
+                      <div className="p-6 md:p-8 space-y-4">
+                        {/* Date */}
+                        <div className="flex items-center space-x-2 text-xs text-slate-400">
+                          <Calendar className="w-3.5 h-3.5" />
+                          <time dateTime={item.date}>{item.date}</time>
+                        </div>
+
+                        {/* Title */}
+                        <h3 
+                          className="text-lg md:text-xl font-heading font-bold text-slate-800 group-hover:text-brand-orange transition-colors duration-300 line-clamp-2 leading-snug cursor-pointer"
+                          onClick={() => openArticle(item)}
+                        >
+                          {bi(item.title, (item as any).title_en)}
+                        </h3>
+
+                        {/* Summary */}
+                        <p className="text-sm text-slate-500 leading-relaxed font-light line-clamp-3">
+                          {bi(item.summary, (item as any).summary_en)}
+                        </p>
+                      </div>
                     </div>
 
-                    {/* Title */}
-                    <h3 
-                      className="text-lg md:text-xl font-heading font-bold text-slate-800 group-hover:text-brand-orange transition-colors duration-300 line-clamp-2 leading-snug cursor-pointer"
-                      onClick={() => openArticle(item)}
-                    >
-                      {bi(item.title, (item as any).title_en)}
-                    </h3>
+                    {/* Read More button */}
+                    <div className="px-6 md:px-8 pb-6 md:pb-8 pt-2">
+                      <button 
+                        onClick={() => openArticle(item)}
+                        className="flex items-center space-x-1.5 text-xs font-bold text-brand-orange group-hover:text-brand-orange/80 transition-colors duration-300"
+                      >
+                        <span>{t('home.news.read')}</span>
+                        <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-300" />
+                      </button>
+                    </div>
+                  </motion.article>
+                ))}
+              </AnimatePresence>
+            </motion.div>
 
-                    {/* Summary */}
-                    <p className="text-sm text-slate-500 leading-relaxed font-light line-clamp-3">
-                      {bi(item.summary, (item as any).summary_en)}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Read More button */}
-                <div className="px-6 md:px-8 pb-6 md:pb-8 pt-2">
-                  <button 
-                    onClick={() => openArticle(item)}
-                    className="flex items-center space-x-1.5 text-xs font-bold text-brand-orange group-hover:text-brand-orange/80 transition-colors duration-300"
-                  >
-                    <span>{t('home.news.read')}</span>
-                    <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-300" />
-                  </button>
-                </div>
-              </motion.article>
-            ))}
-          </AnimatePresence>
-        </motion.div>
-
-        {/* Load More Button */}
-        {hasMore && (
-          <div className="text-center">
-            <button
-              onClick={handleLoadMore}
-              className="px-8 py-3.5 rounded-xl border border-slate-300 hover:border-slate-800 bg-transparent text-slate-700 hover:text-slate-900 text-sm font-semibold tracking-wide shadow-md transition-all duration-300"
-            >
-              {t('home.news.loadmore')}
-            </button>
-          </div>
+            {/* Load More Button */}
+            {hasMore && (
+              <div className="text-center">
+                <button
+                  onClick={handleLoadMore}
+                  className="px-8 py-3.5 rounded-xl border border-slate-300 hover:border-slate-800 bg-transparent text-slate-700 hover:text-slate-900 text-sm font-semibold tracking-wide shadow-md transition-all duration-300"
+                >
+                  {t('home.news.loadmore')}
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
 

@@ -561,7 +561,7 @@ export default function AdminPanel() {
     setProjectsList(updated);
   };
 
-  const updateProjectStat = (prjIdx: number, statIdx: number, field: 'label' | 'value', value: string) => {
+  const updateProjectStat = (prjIdx: number, statIdx: number, field: 'label' | 'label_en' | 'value' | 'value_en', value: string) => {
     const updated = [...projectsList];
     const stats = [...updated[prjIdx].stats];
     stats[statIdx] = { ...stats[statIdx], [field]: value };
@@ -574,10 +574,10 @@ export default function AdminPanel() {
     setBookCta({ ...bookCta, [field]: value });
   };
 
-  const updateBookHighlight = (index: number, field: 'title' | 'desc' | 'iconName', value: string) => {
+  const updateBookHighlight = (index: number, field: 'title' | 'title_en' | 'desc' | 'desc_en' | 'iconName', value: string) => {
     if (!bookCta) return;
     const highlights = [...bookCta.highlights];
-    highlights[index] = { ...highlights[index], [field]: value };
+    highlights[index] = { ...highlights[index], [field]: value } as any;
     setBookCta({ ...bookCta, highlights });
   };
 
@@ -1592,19 +1592,30 @@ export default function AdminPanel() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6">
                         {/* Title, Subtitle */}
                         <div className="space-y-4">
-                          <div className="space-y-1">
-                            <label className="text-xs font-bold text-slate-600">專案標題 *</label>
-                            <input
-                              type="text"
-                              value={project.title}
-                              onChange={(e) => updateProjectField(idx, 'title', e.target.value)}
-                              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
-                              required
-                            />
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                              <label className="text-xs font-bold text-slate-600">專案標題 (繁中) *</label>
+                              <input
+                                type="text"
+                                value={project.title}
+                                onChange={(e) => updateProjectField(idx, 'title', e.target.value)}
+                                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                                required
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="text-xs font-bold text-slate-600">Project Title (English)</label>
+                              <input
+                                type="text"
+                                value={project.title_en || ''}
+                                onChange={(e) => updateProjectField(idx, 'title_en', e.target.value)}
+                                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                              />
+                            </div>
                           </div>
 
                           <div className="space-y-1">
-                            <label className="text-xs font-bold text-slate-600">簡介描述 *</label>
+                            <label className="text-xs font-bold text-slate-600">簡介描述 (繁中) *</label>
                             <textarea
                               value={project.subtitle}
                               onChange={(e) => updateProjectField(idx, 'subtitle', e.target.value)}
@@ -1613,9 +1624,18 @@ export default function AdminPanel() {
                             />
                           </div>
 
+                          <div className="space-y-1">
+                            <label className="text-xs font-bold text-slate-600">Description (English)</label>
+                            <textarea
+                              value={project.subtitle_en || ''}
+                              onChange={(e) => updateProjectField(idx, 'subtitle_en', e.target.value)}
+                              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs h-20 resize-none focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                            />
+                          </div>
+
                           <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1">
-                              <label className="text-xs font-bold text-slate-600">按鈕連結文字</label>
+                              <label className="text-xs font-bold text-slate-600">按鈕連結文字 (繁中)</label>
                               <input
                                 type="text"
                                 value={project.ctaText}
@@ -1624,46 +1644,79 @@ export default function AdminPanel() {
                               />
                             </div>
                             <div className="space-y-1">
-                              <label className="text-xs font-bold text-slate-600">代表圖示名稱 (Lucide Icon)</label>
-                              <select
-                                value={project.iconName}
-                                onChange={(e) => updateProjectField(idx, 'iconName', e.target.value)}
-                                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white focus:ring-1 focus:ring-blue-500 focus:outline-none"
-                              >
-                                <option value="Award">Award (金恆獎)</option>
-                                <option value="BookOpen">BookOpen (教育書籍)</option>
-                                <option value="Music">Music (音樂會)</option>
-                                <option value="Shield">Shield (防護盾)</option>
-                                <option value="Zap">Zap (閃電)</option>
-                                <option value="Star">Star (星號)</option>
-                              </select>
+                              <label className="text-xs font-bold text-slate-600">Button Text (English)</label>
+                              <input
+                                type="text"
+                                value={project.ctaText_en || ''}
+                                onChange={(e) => updateProjectField(idx, 'ctaText_en', e.target.value)}
+                                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                              />
                             </div>
+                          </div>
+
+                          <div className="space-y-1">
+                            <label className="text-xs font-bold text-slate-600">代表圖示名稱 (Lucide Icon)</label>
+                            <select
+                              value={project.iconName}
+                              onChange={(e) => updateProjectField(idx, 'iconName', e.target.value)}
+                              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                            >
+                              <option value="Award">Award (金恆獎)</option>
+                              <option value="BookOpen">BookOpen (教育書籍)</option>
+                              <option value="Music">Music (音樂會)</option>
+                              <option value="Shield">Shield (防護盾)</option>
+                              <option value="Zap">Zap (閃電)</option>
+                              <option value="Star">Star (星號)</option>
+                            </select>
                           </div>
                         </div>
 
                         {/* Statistics Grid */}
                         <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-4">
-                          <h4 className="text-xs font-bold text-slate-700">指標數據修改 (例如: 100+ 所 / 合作學校)</h4>
+                          <h4 className="text-xs font-bold text-slate-700">指標數據修改 (Bilingual Stats)</h4>
                           
                           {project.stats && project.stats.map((stat, sIdx) => (
-                            <div key={sIdx} className="grid grid-cols-2 gap-3 border-b border-slate-50 pb-3 last:border-0 last:pb-0">
-                              <div className="space-y-1">
-                                <label className="text-[10px] text-slate-500 font-semibold">數據指標 {sIdx + 1} 標籤</label>
-                                <input
-                                  type="text"
-                                  value={stat.label}
-                                  onChange={(e) => updateProjectStat(idx, sIdx, 'label', e.target.value)}
-                                  className="w-full px-3.5 py-1.5 rounded-lg border border-slate-200 text-xs"
-                                />
+                            <div key={sIdx} className="p-3 bg-slate-50 border border-slate-100 rounded-xl space-y-2.5">
+                              <span className="text-[9px] font-bold text-slate-400 block uppercase">指標數據 {sIdx + 1}</span>
+                              <div className="grid grid-cols-2 gap-2">
+                                <div className="space-y-1">
+                                  <label className="text-[10px] text-slate-500 font-semibold">標籤 (繁中)</label>
+                                  <input
+                                    type="text"
+                                    value={stat.label}
+                                    onChange={(e) => updateProjectStat(idx, sIdx, 'label', e.target.value)}
+                                    className="w-full px-3 py-1 rounded-lg border border-slate-200 text-xs bg-white"
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <label className="text-[10px] text-slate-500 font-semibold">Label (English)</label>
+                                  <input
+                                    type="text"
+                                    value={stat.label_en || ''}
+                                    onChange={(e) => updateProjectStat(idx, sIdx, 'label_en', e.target.value)}
+                                    className="w-full px-3 py-1 rounded-lg border border-slate-200 text-xs bg-white"
+                                  />
+                                </div>
                               </div>
-                              <div className="space-y-1">
-                                <label className="text-[10px] text-slate-500 font-semibold">數據指標 {sIdx + 1} 數值</label>
-                                <input
-                                  type="text"
-                                  value={stat.value}
-                                  onChange={(e) => updateProjectStat(idx, sIdx, 'value', e.target.value)}
-                                  className="w-full px-3.5 py-1.5 rounded-lg border border-slate-200 text-xs"
-                                />
+                              <div className="grid grid-cols-2 gap-2">
+                                <div className="space-y-1">
+                                  <label className="text-[10px] text-slate-500 font-semibold">數值 (繁中)</label>
+                                  <input
+                                    type="text"
+                                    value={stat.value}
+                                    onChange={(e) => updateProjectStat(idx, sIdx, 'value', e.target.value)}
+                                    className="w-full px-3 py-1 rounded-lg border border-slate-200 text-xs bg-white"
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <label className="text-[10px] text-slate-500 font-semibold">Value (English)</label>
+                                  <input
+                                    type="text"
+                                    value={(stat as any).value_en || ''}
+                                    onChange={(e) => updateProjectStat(idx, sIdx, 'value_en', e.target.value)}
+                                    className="w-full px-3 py-1 rounded-lg border border-slate-200 text-xs bg-white"
+                                  />
+                                </div>
                               </div>
                             </div>
                           ))}
@@ -2023,7 +2076,7 @@ export default function AdminPanel() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-4">
                       <div className="space-y-1">
-                        <label className="text-xs font-bold text-slate-600">電子書標題名稱 *</label>
+                        <label className="text-xs font-bold text-slate-600">電子書標題名稱 (繁中) *</label>
                         <input
                           type="text"
                           value={bookCta.title}
@@ -2034,7 +2087,17 @@ export default function AdminPanel() {
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-xs font-bold text-slate-600">專著簡介說明 *</label>
+                        <label className="text-xs font-bold text-slate-600">eBook Title (English)</label>
+                        <input
+                          type="text"
+                          value={bookCta.title_en || ''}
+                          onChange={(e) => updateBookField('title_en', e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-1"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-slate-600">專著簡介說明 (繁中) *</label>
                         <textarea
                           value={bookCta.description}
                           onChange={(e) => updateBookField('description', e.target.value)}
@@ -2044,11 +2107,30 @@ export default function AdminPanel() {
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-xs font-bold text-slate-600">按鈕下載連結文字</label>
+                        <label className="text-xs font-bold text-slate-600">Description (English)</label>
+                        <textarea
+                          value={bookCta.description_en || ''}
+                          onChange={(e) => updateBookField('description_en', e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs h-28 resize-none"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-slate-600">按鈕下載連結文字 (繁中)</label>
                         <input
                           type="text"
                           value={bookCta.buttonText}
                           onChange={(e) => updateBookField('buttonText', e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-slate-600">Button Text (English)</label>
+                        <input
+                          type="text"
+                          value={bookCta.buttonText_en || ''}
+                          onChange={(e) => updateBookField('buttonText_en', e.target.value)}
                           className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs"
                         />
                       </div>
@@ -2062,7 +2144,7 @@ export default function AdminPanel() {
                           <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block">亮點卡片 {index + 1}</span>
                           <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1">
-                              <label className="text-[10px] text-slate-500 font-semibold">小標題</label>
+                              <label className="text-[10px] text-slate-500 font-semibold">小標題 (繁中)</label>
                               <input
                                 type="text"
                                 value={hl.title}
@@ -2070,6 +2152,18 @@ export default function AdminPanel() {
                                 className="w-full px-3.5 py-1 rounded-lg border border-slate-200 text-xs"
                               />
                             </div>
+                            <div className="space-y-1">
+                              <label className="text-[10px] text-slate-500 font-semibold">Title (English)</label>
+                              <input
+                                type="text"
+                                value={hl.title_en || ''}
+                                onChange={(e) => updateBookHighlight(index, 'title_en', e.target.value)}
+                                className="w-full px-3.5 py-1 rounded-lg border border-slate-200 text-xs"
+                              />
+                            </div>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1">
                               <label className="text-[10px] text-slate-500 font-semibold">圖示名稱</label>
                               <select
@@ -2083,12 +2177,23 @@ export default function AdminPanel() {
                               </select>
                             </div>
                           </div>
+
                           <div className="space-y-1">
-                            <label className="text-[10px] text-slate-500 font-semibold">簡短摘要描述</label>
+                            <label className="text-[10px] text-slate-500 font-semibold">簡短摘要描述 (繁中)</label>
                             <input
                               type="text"
                               value={hl.desc}
                               onChange={(e) => updateBookHighlight(index, 'desc', e.target.value)}
+                              className="w-full px-3.5 py-1 rounded-lg border border-slate-200 text-xs"
+                            />
+                          </div>
+
+                          <div className="space-y-1">
+                            <label className="text-[10px] text-slate-500 font-semibold">Description (English)</label>
+                            <input
+                              type="text"
+                              value={hl.desc_en || ''}
+                              onChange={(e) => updateBookHighlight(index, 'desc_en', e.target.value)}
                               className="w-full px-3.5 py-1 rounded-lg border border-slate-200 text-xs"
                             />
                           </div>

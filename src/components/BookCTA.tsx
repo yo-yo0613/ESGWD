@@ -3,9 +3,13 @@ import * as Lucide from 'lucide-react';
 import { loadConfig } from '../utils/configLoader';
 import { initialBookCta } from '../data/siteInitialData';
 import type { BookCtaData } from '../data/siteInitialData';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function BookCTA() {
   const [bookData, setBookData] = useState<BookCtaData>(initialBookCta);
+  const { language, t } = useLanguage();
+
+  const bi = (zh: string, en?: string) => (language === 'en' && en) ? en : zh;
 
   // Dynamic Config Loading with Storage Event Sync
   useEffect(() => {
@@ -31,13 +35,13 @@ export default function BookCTA() {
         <div className="lg:col-span-7 space-y-8">
           <div className="space-y-4">
             <span className="text-xs font-bold uppercase tracking-widest text-brand-amber bg-brand-amber/10 px-3.5 py-1.5 rounded-full">
-              PUBLICATIONS & KNOWLEDGE
+              {t('home.book.label')}
             </span>
             <h2 className="text-3xl md:text-5xl font-heading font-extrabold text-slate-900 leading-tight">
-              {bookData.title}
+              {bi(bookData.title, bookData.title_en)}
             </h2>
             <p className="text-slate-600 text-base md:text-lg leading-relaxed font-light">
-              {bookData.description}
+              {bi(bookData.description, bookData.description_en)}
             </p>
           </div>
 
@@ -51,8 +55,12 @@ export default function BookCTA() {
                     <IconComponent className="w-4.5 h-4.5" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-semibold text-slate-800">{highlight.title}</h4>
-                    <p className="text-xs text-slate-500 leading-relaxed mt-1">{highlight.desc}</p>
+                    <h4 className="text-sm font-semibold text-slate-800">
+                      {bi(highlight.title, highlight.title_en)}
+                    </h4>
+                    <p className="text-xs text-slate-500 leading-relaxed mt-1 font-light">
+                      {bi(highlight.desc, highlight.desc_en)}
+                    </p>
                   </div>
                 </div>
               );
@@ -63,14 +71,14 @@ export default function BookCTA() {
           <div className="pt-6">
             <a
               href="#"
-              onClick={(e) => { e.preventDefault(); alert('電子書下載中... (模擬下載)'); }}
+              onClick={(e) => { e.preventDefault(); alert(language === 'en' ? 'Downloading eBook... (Simulated)' : '電子書下載中... (模擬下載)'); }}
               className="inline-flex items-center space-x-3 px-8 py-4 rounded-xl font-heading font-semibold text-brand-navy bg-gradient-to-r from-brand-amber to-brand-orange hover:shadow-2xl hover:shadow-brand-orange/20 hover:scale-105 active:scale-95 transition-all duration-300"
             >
               <Lucide.Download className="w-5 h-5" />
-              <span>{bookData.buttonText}</span>
+              <span>{bi(bookData.buttonText, bookData.buttonText_en)}</span>
             </a>
             <span className="block text-[11px] text-slate-400 mt-3 tracking-wide pl-2">
-              PDF 格式 · 繁體中文版 · 完整收完整 12 個核心章節
+              {t('home.book.format')}
             </span>
           </div>
         </div>
@@ -90,7 +98,7 @@ export default function BookCTA() {
                 {/* Cover Header */}
                 <div className="text-center mt-6 z-10">
                   <span className="text-[10px] text-brand-amber font-heading font-semibold tracking-widest uppercase block mb-1">
-                    Academic Publication
+                    {t('book.academic')}
                   </span>
                   <div className="w-8 h-px bg-brand-amber/50 mx-auto" />
                 </div>
@@ -98,20 +106,20 @@ export default function BookCTA() {
                 {/* Cover Title */}
                 <div className="text-center z-10 px-2">
                   <h3 className="text-xl md:text-2xl font-serif font-bold text-white tracking-widest leading-relaxed">
-                    世界公民
+                    {language === 'en' ? 'World Citizen' : '世界公民'}
                   </h3>
                   <h3 className="text-xl md:text-2xl font-serif font-bold text-white tracking-widest leading-relaxed">
-                    基本法的探索
+                    {language === 'en' ? 'Basic Law' : '基本法的探索'}
                   </h3>
                   <span className="text-[10px] text-white/50 tracking-wide block mt-3 font-light italic">
-                    The Exploration of World Citizen Basic Law
+                    {language === 'zh' ? 'The Exploration of World Citizen Basic Law' : 'The Exploration of World Citizen Basic Law'}
                   </span>
                 </div>
 
                 {/* Cover Footer */}
                 <div className="text-center mb-6 z-10">
                   <p className="text-[10px] text-brand-amber tracking-wide">
-                    陳春山教授 著
+                    {t('book.author')}
                   </p>
                   <span className="text-[8px] text-white/30 tracking-widest block uppercase mt-1">
                     World Citizens & Digital Governance
@@ -128,7 +136,7 @@ export default function BookCTA() {
                   WCF
                 </span>
                 <span className="text-[10px] text-white font-serif tracking-widest rotate-90 my-auto block whitespace-nowrap">
-                  世界公民基本法的探索
+                  {language === 'en' ? 'World Citizen Basic Law' : '世界公民基本法的探索'}
                 </span>
                 <span className="text-[8px] text-brand-amber/50 rotate-90 my-2 block">
                   LAW
@@ -138,7 +146,7 @@ export default function BookCTA() {
               {/* Back Cover */}
               <div className="absolute inset-0 bg-brand-navy border-2 border-brand-amber/50 rounded-l-lg shadow-2xl z-10 transform-translate-z-[-12px] rotate-y-180 flex items-center justify-center p-8 text-center">
                 <div className="text-[10px] text-white/30 leading-relaxed">
-                  本書探尋二十一世紀地球公民應具備之法律素養與全球責任。
+                  {t('book.backtext')}
                 </div>
               </div>
 

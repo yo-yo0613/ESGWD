@@ -1,17 +1,20 @@
 import { Mail, Phone, MapPin, Heart } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 interface FooterProps {
   onNavigate: (sectionId: string) => void;
 }
 
 export default function Footer({ onNavigate }: FooterProps) {
+  const { language, t } = useLanguage();
+
   const quickLinks = [
-    { id: 'hero', name: '首頁開場' },
-    { id: 'projects', name: '核心專案' },
-    { id: 'news', name: '最新消息' },
-    { id: 'sponsors', name: '企業贊助' },
-    { id: 'publications', name: '出版品' },
-    { id: 'donate', name: '桂冠會員' },
+    { id: 'hero', name: t('footer.link.home') },
+    { id: 'projects', name: t('footer.link.projects') },
+    { id: 'news', name: t('footer.link.news') },
+    { id: 'sponsors', name: t('footer.link.sponsors') },
+    { id: 'publications', name: t('footer.link.publications') },
+    { id: 'donate', name: t('footer.link.donate') },
   ];
 
   return (
@@ -26,8 +29,8 @@ export default function Footer({ onNavigate }: FooterProps) {
               className="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
             />
           </div>
-          <p className="text-sm text-slate-400 leading-relaxed pt-2">
-            致力於推動世界公民素養教育、永續發展與科技雙軸轉型。深耕社會公益、良善品格與跨界藝術的完美融合，攜手企業與大眾共創綠色未來。
+          <p className="text-sm text-slate-450 leading-relaxed pt-2 font-light">
+            {t('footer.desc')}
           </p>
           <div className="flex space-x-4 pt-2">
             <a href="#" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-amber hover:text-brand-navy transition-all duration-300" aria-label="Facebook">
@@ -46,14 +49,14 @@ export default function Footer({ onNavigate }: FooterProps) {
         {/* Quick Links */}
         <div>
           <h4 className="text-white font-semibold text-base mb-6 tracking-wide relative after:content-[''] after:absolute after:bottom-[-8px] after:left-0 after:w-8 after:h-0.5 after:bg-brand-amber">
-            快速導覽
+            {t('footer.links.title')}
           </h4>
           <ul className="space-y-3 text-sm">
             {quickLinks.map((link) => (
               <li key={link.id}>
                 <button
                   onClick={() => onNavigate(link.id)}
-                  className="hover:text-brand-amber hover:translate-x-1 transition-all duration-300 text-left"
+                  className="hover:text-brand-amber hover:translate-x-1 transition-all duration-300 text-left font-light"
                 >
                   {link.name}
                 </button>
@@ -65,20 +68,20 @@ export default function Footer({ onNavigate }: FooterProps) {
         {/* Contact Info */}
         <div className="space-y-4">
           <h4 className="text-white font-semibold text-base mb-6 tracking-wide relative after:content-[''] after:absolute after:bottom-[-8px] after:left-0 after:w-8 after:h-0.5 after:bg-brand-amber">
-            聯絡資訊
+            {t('footer.contact.title')}
           </h4>
-          <ul className="space-y-3 text-sm">
+          <ul className="space-y-3 text-sm font-light">
             <li className="flex items-start space-x-3">
               <MapPin className="w-4 h-4 text-brand-amber shrink-0 mt-1" />
-              <span>台北市南港區園區街 3-2 號 10 樓 (南港軟體園區)</span>
+              <span>{t('footer.contact.address')}</span>
             </li>
             <li className="flex items-center space-x-3">
               <Phone className="w-4 h-4 text-brand-amber shrink-0" />
-              <span>+886-2-2655-0000 (代表號)</span>
+              <span>{t('footer.contact.phone')}</span>
             </li>
             <li className="flex items-center space-x-3">
               <Mail className="w-4 h-4 text-brand-amber shrink-0" />
-              <span>contact@esgwd.org</span>
+              <span>{t('footer.email')}</span>
             </li>
           </ul>
         </div>
@@ -86,14 +89,14 @@ export default function Footer({ onNavigate }: FooterProps) {
         {/* Newsletter / Certification */}
         <div className="space-y-4">
           <h4 className="text-white font-semibold text-base mb-6 tracking-wide relative after:content-[''] after:absolute after:bottom-[-8px] after:left-0 after:w-8 after:h-0.5 after:bg-brand-amber">
-            認證與主管主管課程
+            {t('footer.cert.title')}
           </h4>
-          <p className="text-sm text-slate-400 leading-relaxed">
-            本會榮獲內政部公益社團認證，並提供「董監事與公司治理主管認證課程」，具備法律效力之學分證明。
+          <p className="text-sm text-slate-400 leading-relaxed font-light">
+            {t('footer.cert.desc')}
           </p>
           <div className="pt-2">
             <span className="inline-block px-3 py-1.5 rounded bg-slate-950 border border-slate-800 text-xs font-semibold text-brand-amber tracking-wider">
-              政府立案字號：台內社字第 1120005678 號
+              {t('footer.cert.code')}
             </span>
           </div>
         </div>
@@ -102,12 +105,12 @@ export default function Footer({ onNavigate }: FooterProps) {
       {/* Bottom Bar */}
       <div className="max-w-7xl mx-auto px-6 md:px-12 border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-slate-500 space-y-4 md:space-y-0">
         <div>
-          © {new Date().getFullYear()} 世界公民數位治理基金會 World Citizens & Digital Governance. All Rights Reserved.
+          {t('footer.rights')}
         </div>
-        <div className="flex items-center space-x-1">
-          <span>用愛與智慧</span>
+        <div className="flex items-center space-x-1 font-light">
+          <span>{language === 'en' ? 'Protecting Earth with Love & Wisdom' : '用愛與智慧'}</span>
           <Heart className="w-3.5 h-3.5 text-brand-orange fill-brand-orange animate-pulse" />
-          <span>守護地球，引領雙軸轉型</span>
+          <span>{language === 'en' ? 'Leading Twin Transition' : '守護地球，引領雙軸轉型'}</span>
         </div>
       </div>
     </footer>

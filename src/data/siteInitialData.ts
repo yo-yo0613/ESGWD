@@ -11,9 +11,12 @@ export interface HeroSlideData {
 export interface ProjectData {
   id: number;
   title: string;
+  title_en?: string;
   subtitle: string;
-  stats: { label: string; value: string }[];
+  subtitle_en?: string;
+  stats: { label: string; label_en?: string; value: string; value_en?: string }[];
   ctaText: string;
+  ctaText_en?: string;
   iconName: string;
   color: string;
   bgGradient: string;
@@ -47,9 +50,12 @@ export interface AwardWinnerData {
 
 export interface BookCtaData {
   title: string;
+  title_en?: string;
   description: string;
-  highlights: { title: string; desc: string; iconName: string }[];
+  description_en?: string;
+  highlights: { title: string; title_en?: string; desc: string; desc_en?: string; iconName: string }[];
   buttonText: string;
+  buttonText_en?: string;
 }
 
 export interface DonationPlanData {
