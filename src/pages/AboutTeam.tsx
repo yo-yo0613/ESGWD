@@ -2,41 +2,31 @@ import { useState, useEffect } from 'react';
 import SubPageLayout from '../components/SubPageLayout';
 import { loadConfig } from '../utils/configLoader';
 
+interface Member {
+  name: string;
+  role: string;
+  desc: string;
+  avatar: string;
+}
+
 export default function AboutTeam() {
-  const [avatars, setAvatars] = useState<Record<string, string>>({});
+  const [partners, setPartners] = useState<Member[]>([]);
 
   useEffect(() => {
     async function load() {
-      const data = await loadConfig<{ board: Record<string, string>; team: Record<string, string> }>('about_us_avatars');
+      const data = await loadConfig<{
+        board: Member[];
+        directors: Member[];
+        honorary: Member[];
+        team: Member[];
+      }>('about_us_members');
+      
       if (data && data.team) {
-        setAvatars(data.team);
+        setPartners(data.team);
       }
     }
     load();
   }, []);
-
-  const partners = [
-    {
-      name: '林筠騏',
-      role: '秘書長',
-      desc: '規劃基金會核心政策、雙軸轉型策略倡議與跨界合作專案的整體規劃。',
-    },
-    {
-      name: '許玉青',
-      role: '副秘書長',
-      desc: '協助秘書長執行會務，督導環境與數位治理專案及良善教育活動之校園合作推廣。',
-    },
-    {
-      name: '駱怡雯',
-      role: '專案經理',
-      desc: '專責雙軸轉型金恆獎評審委員會溝通、企業客製化到府授課專案管理。',
-    },
-    {
-      name: '黃慧欣',
-      role: '專案專員',
-      desc: '負責基金會日常行政管理、社群推廣運營及世界公民年度音樂會等大型活動籌辦。',
-    },
-  ];
 
   return (
     <SubPageLayout>
@@ -62,8 +52,8 @@ export default function AboutTeam() {
             <div key={idx} className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col items-center text-center space-y-4 hover:shadow-md transition-shadow duration-300">
               {/* Photo Frame with Silhouette Icon / Image */}
               <div className="w-24 h-24 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden relative group">
-                {avatars[member.name] ? (
-                  <img src={avatars[member.name]} alt={member.name} className="w-full h-full object-cover" />
+                {member.avatar ? (
+                  <img src={member.avatar} alt={member.name} className="w-full h-full object-cover" />
                 ) : (
                   <svg className="w-12 h-12 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />

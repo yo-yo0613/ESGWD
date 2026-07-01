@@ -27,6 +27,7 @@ export interface NewsArticleData {
   date: string;
   summary: string;
   image: string;
+  images?: string[];
 }
 
 export interface SponsorData {

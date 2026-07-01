@@ -60,13 +60,22 @@ interface VisitorLog {
   created_at: string;
 }
 
-interface AboutUsAvatars {
-  board: Record<string, string>;
-  team: Record<string, string>;
+interface Member {
+  name: string;
+  role: string;
+  desc: string;
+  avatar: string;
+}
+
+interface AboutUsMembers {
+  board: Member[];
+  directors: Member[];
+  honorary: Member[];
+  team: Member[];
 }
 
 export default function AdminPanel() {
-  const [aboutAvatars, setAboutAvatars] = useState<AboutUsAvatars>({ board: {}, team: {} });
+  const [aboutMembers, setAboutMembers] = useState<AboutUsMembers>({ board: [], directors: [], honorary: [], team: [] });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState<
     'dashboard' | 'bento' | 'hero' | 'projects' | 'news' | 'partners' | 'ebook_donation' | 'analytics' | 'settings' | 'about_us'
@@ -255,8 +264,8 @@ export default function AdminPanel() {
     const lsu = await loadConfig<string>('looker_studio_url');
     if (lsu) setLookerStudioUrl(lsu);
 
-    const avatars = await loadConfig<AboutUsAvatars>('about_us_avatars');
-    if (avatars) setAboutAvatars(avatars);
+    const members = await loadConfig<AboutUsMembers>('about_us_members');
+    if (members) setAboutMembers(members);
   };
 
   const fetchVisitorLogs = async () => {
@@ -773,6 +782,151 @@ export default function AdminPanel() {
       .map(name => ({ name, value: referrerMap[name] }))
       .sort((a, b) => b.value - a.value)
       .slice(0, 5);
+  };
+
+  const renderCategoryManager = (
+    title: string,
+    key: keyof AboutUsMembers,
+    colorClass: string
+  ) => {
+    const list = aboutMembers[key] || [];
+    return (
+      <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm space-y-6">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <h3 className="text-sm font-extrabold text-slate-800 tracking-wide flex items-center space-x-2">
+            <Users className={`w-4 h-4 ${colorClass}`} />
+            <span>{title}</span>
+          </h3>
+          <button
+            onClick={() => {
+              const updated = { ...aboutMembers };
+              updated[key] = [
+                ...updated[key],
+                { name: '新成員姓名', role: '職稱', desc: '學經歷與簡介', avatar: '' }
+              ];
+              setAboutMembers(updated);
+            }}
+            className="px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 text-[10px] font-bold rounded-lg transition-colors flex items-center space-x-1"
+          >
+            <span>+ 新增成員</span>
+          </button>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[500px] overflow-y-auto pr-2">
+          {list.map((member, index) => (
+            <div key={index} className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3 relative group">
+              <button
+                onClick={() => {
+                  if (confirm(`確定要刪除成員 ${member.name} 嗎？`)) {
+                    const updated = { ...aboutMembers };
+                    updated[key] = updated[key].filter((_, i) => i !== index);
+                    setAboutMembers(updated);
+                  }
+                }}
+                className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-[10px] font-bold"
+              >
+                刪除成員
+              </button>
+              <div className="space-y-2 text-left">
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="text-[9px] text-slate-400 block font-bold mb-0.5">姓名</label>
+                    <input
+                      type="text"
+                      value={member.name}
+                      onChange={(e) => {
+                        const updated = { ...aboutMembers };
+                        const items = [...updated[key]];
+                        items[index] = { ...items[index], name: e.target.value };
+                        updated[key] = items;
+                        setAboutMembers(updated);
+                      }}
+                      className="w-full px-2 py-1 rounded border border-slate-200 text-xs focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[9px] text-slate-400 block font-bold mb-0.5">職稱</label>
+                    <input
+                      type="text"
+                      value={member.role}
+                      onChange={(e) => {
+                        const updated = { ...aboutMembers };
+                        const items = [...updated[key]];
+                        items[index] = { ...items[index], role: e.target.value };
+                        updated[key] = items;
+                        setAboutMembers(updated);
+                      }}
+                      className="w-full px-2 py-1 rounded border border-slate-200 text-xs focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[9px] text-slate-400 block font-bold mb-0.5">簡介 (學經歷/Biograph)</label>
+                  <textarea
+                    value={member.desc}
+                    rows={2}
+                    onChange={(e) => {
+                      const updated = { ...aboutMembers };
+                      const items = [...updated[key]];
+                      items[index] = { ...items[index], desc: e.target.value };
+                      updated[key] = items;
+                      setAboutMembers(updated);
+                    }}
+                    className="w-full px-2 py-1 rounded border border-slate-200 text-[11px] focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+                
+                <div className="flex items-center space-x-3 pt-1 border-t border-slate-200/50">
+                  <div className="w-10 h-10 rounded-full bg-slate-200 border border-slate-300 overflow-hidden flex items-center justify-center shrink-0">
+                    {member.avatar ? (
+                      <img src={member.avatar} className="w-full h-full object-cover" />
+                    ) : (
+                      <svg className="w-5 h-5 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </div>
+                  <div className="flex-grow space-y-1 min-w-0">
+                    <input
+                      type="text"
+                      placeholder="貼上頭像網址..."
+                      value={member.avatar}
+                      onChange={(e) => {
+                        const updated = { ...aboutMembers };
+                        const items = [...updated[key]];
+                        items[index] = { ...items[index], avatar: e.target.value };
+                        updated[key] = items;
+                        setAboutMembers(updated);
+                      }}
+                      className="w-full px-2 py-1 rounded border border-slate-200 text-[9px] focus:ring-1 focus:ring-blue-500"
+                    />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={async (e) => {
+                        if (!e.target.files || e.target.files.length === 0) return;
+                        const file = e.target.files[0];
+                        const url = await uploadToCloudinary(file);
+                        if (url) {
+                          const updated = { ...aboutMembers };
+                          const items = [...updated[key]];
+                          items[index] = { ...items[index], avatar: url };
+                          updated[key] = items;
+                          setAboutMembers(updated);
+                          alert(`✨ ${member.name} 的頭像上傳成功！`);
+                        } else {
+                          alert('上傳失敗，請檢查網路或 Cloudinary');
+                        }
+                      }}
+                      className="text-[8px] text-slate-500 block file:mr-1 file:py-0.5 file:px-1 file:rounded file:border-0 file:text-[8px] file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -2200,284 +2354,10 @@ export default function AdminPanel() {
           {/* 7. ABOUT & TEAM VIEW */}
           {activeTab === 'about_us' && (
             <div className="space-y-8 animate-fade-in max-w-4xl mx-auto my-6">
-              <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm space-y-6">
-                <h3 className="text-sm font-extrabold text-slate-800 tracking-wide border-b border-slate-100 pb-3 flex items-center space-x-2">
-                  <Users className="w-4 h-4 text-pink-500" />
-                  <span>董事會成員頭像管理</span>
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {['陳春山', '陳政興'].map((name) => (
-                    <div key={name} className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-slate-700">{name} (常務董事)</span>
-                        {aboutAvatars.board[name] && (
-                          <button
-                            onClick={() => {
-                              const updated = { ...aboutAvatars };
-                              delete updated.board[name];
-                              setAboutAvatars(updated);
-                            }}
-                            className="text-[10px] text-red-500 hover:underline"
-                          >
-                            移除頭像
-                          </button>
-                        )}
-                      </div>
-                      <div className="flex items-center space-x-3">
-                        <div className="w-12 h-12 rounded-full bg-slate-200 border border-slate-300 overflow-hidden flex items-center justify-center shrink-0">
-                          {aboutAvatars.board[name] ? (
-                            <img src={aboutAvatars.board[name]} className="w-full h-full object-cover" />
-                          ) : (
-                            <svg className="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                            </svg>
-                          )}
-                        </div>
-                        <div className="flex-grow space-y-2">
-                          <input
-                            type="text"
-                            placeholder="貼上頭像圖片 URL..."
-                            value={aboutAvatars.board[name] || ''}
-                            onChange={(e) => {
-                              const updated = { ...aboutAvatars };
-                              updated.board[name] = e.target.value;
-                              setAboutAvatars(updated);
-                            }}
-                            className="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-[11px] focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                          />
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={async (e) => {
-                              if (!e.target.files || e.target.files.length === 0) return;
-                              const file = e.target.files[0];
-                              const url = await uploadToCloudinary(file);
-                              if (url) {
-                                const updated = { ...aboutAvatars };
-                                updated.board[name] = url;
-                                setAboutAvatars(updated);
-                                alert('✨ 董事頭像上傳成功！');
-                              } else {
-                                alert('上傳失敗，請檢查網路或 Cloudinary');
-                              }
-                            }}
-                            className="text-[10px] text-slate-500 block file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-[10px] file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm space-y-6">
-                <h3 className="text-sm font-extrabold text-slate-800 tracking-wide border-b border-slate-100 pb-3 flex items-center space-x-2">
-                  <Users className="w-4 h-4 text-pink-500" />
-                  <span>董事會成員頭像管理</span>
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[400px] overflow-y-auto pr-2">
-                  {['王文山', '何子明', '佘日新', '吳明賢', '周行一', '周桂田', '胡元輝', '梁又文', '楊岳虎', '陳孝昌', '陳美伶', '陳雅婕', '潘維大', '盧秋玲'].map((name) => (
-                    <div key={name} className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-slate-700">{name} (董事)</span>
-                        {aboutAvatars.board[name] && (
-                          <button
-                            onClick={() => {
-                              const updated = { ...aboutAvatars };
-                              delete updated.board[name];
-                              setAboutAvatars(updated);
-                            }}
-                            className="text-[10px] text-red-500 hover:underline"
-                          >
-                            移除頭像
-                          </button>
-                        )}
-                      </div>
-                      <div className="flex items-center space-x-3">
-                        <div className="w-12 h-12 rounded-full bg-slate-200 border border-slate-300 overflow-hidden flex items-center justify-center shrink-0">
-                          {aboutAvatars.board[name] ? (
-                            <img src={aboutAvatars.board[name]} className="w-full h-full object-cover" />
-                          ) : (
-                            <svg className="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                            </svg>
-                          )}
-                        </div>
-                        <div className="flex-grow space-y-2 min-w-0">
-                          <input
-                            type="text"
-                            placeholder="貼上頭像圖片 URL..."
-                            value={aboutAvatars.board[name] || ''}
-                            onChange={(e) => {
-                              const updated = { ...aboutAvatars };
-                              updated.board[name] = e.target.value;
-                              setAboutAvatars(updated);
-                            }}
-                            className="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-[10px] focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                          />
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={async (e) => {
-                              if (!e.target.files || e.target.files.length === 0) return;
-                              const file = e.target.files[0];
-                              const url = await uploadToCloudinary(file);
-                              if (url) {
-                                const updated = { ...aboutAvatars };
-                                updated.board[name] = url;
-                                setAboutAvatars(updated);
-                                alert('✨ 董事頭像上傳成功！');
-                              } else {
-                                alert('上傳失敗，請檢查網路或 Cloudinary');
-                              }
-                            }}
-                            className="text-[9px] text-slate-500 block file:mr-1 file:py-0.5 file:px-1.5 file:rounded file:border-0 file:text-[9px] file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm space-y-6">
-                <h3 className="text-sm font-extrabold text-slate-800 tracking-wide border-b border-slate-100 pb-3 flex items-center space-x-2">
-                  <Users className="w-4 h-4 text-pink-500" />
-                  <span>榮譽董事成員頭像管理</span>
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {['陳進財', '黃士軍', '彭裕民', '王國雄'].map((name) => (
-                    <div key={name} className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-slate-700">{name} (榮譽董事)</span>
-                        {aboutAvatars.board[name] && (
-                          <button
-                            onClick={() => {
-                              const updated = { ...aboutAvatars };
-                              delete updated.board[name];
-                              setAboutAvatars(updated);
-                            }}
-                            className="text-[10px] text-red-500 hover:underline"
-                          >
-                            移除頭像
-                          </button>
-                        )}
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <div className="w-10 h-10 rounded-full bg-slate-200 border border-slate-300 overflow-hidden flex items-center justify-center shrink-0">
-                          {aboutAvatars.board[name] ? (
-                            <img src={aboutAvatars.board[name]} className="w-full h-full object-cover" />
-                          ) : (
-                            <svg className="w-5 h-5 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                            </svg>
-                          )}
-                        </div>
-                        <div className="flex-grow space-y-1 min-w-0">
-                          <input
-                            type="text"
-                            placeholder="圖片 URL..."
-                            value={aboutAvatars.board[name] || ''}
-                            onChange={(e) => {
-                              const updated = { ...aboutAvatars };
-                              updated.board[name] = e.target.value;
-                              setAboutAvatars(updated);
-                            }}
-                            className="w-full px-2 py-1 rounded-lg border border-slate-200 text-[9px] focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                          />
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={async (e) => {
-                              if (!e.target.files || e.target.files.length === 0) return;
-                              const file = e.target.files[0];
-                              const url = await uploadToCloudinary(file);
-                              if (url) {
-                                const updated = { ...aboutAvatars };
-                                updated.board[name] = url;
-                                setAboutAvatars(updated);
-                                alert('✨ 榮譽董事頭像上傳成功！');
-                              } else {
-                                alert('上傳失敗，請檢查網路或 Cloudinary');
-                              }
-                            }}
-                            className="text-[8px] text-slate-500 block file:mr-1 file:py-0.5 file:px-1 file:rounded file:border-0 file:text-[8px] file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div> 
-
-              <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm space-y-6">
-                <h3 className="text-sm font-extrabold text-slate-800 tracking-wide border-b border-slate-100 pb-3 flex items-center space-x-2">
-                  <Users className="w-4 h-4 text-orange-500" />
-                  <span>團隊夥伴成員頭像管理</span>
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {['林筠騏', '許玉青', '駱怡雯', '黃慧欣'].map((name) => (
-                    <div key={name} className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-slate-700">{name} (團隊成員)</span>
-                        {aboutAvatars.team[name] && (
-                          <button
-                            onClick={() => {
-                              const updated = { ...aboutAvatars };
-                              delete updated.team[name];
-                              setAboutAvatars(updated);
-                            }}
-                            className="text-[10px] text-red-500 hover:underline"
-                          >
-                            移除頭像
-                          </button>
-                        )}
-                      </div>
-                      <div className="flex items-center space-x-3">
-                        <div className="w-12 h-12 rounded-full bg-slate-200 border border-slate-300 overflow-hidden flex items-center justify-center shrink-0">
-                          {aboutAvatars.team[name] ? (
-                            <img src={aboutAvatars.team[name]} className="w-full h-full object-cover" />
-                          ) : (
-                            <svg className="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                            </svg>
-                          )}
-                        </div>
-                        <div className="flex-grow space-y-2">
-                          <input
-                            type="text"
-                            placeholder="貼上頭像圖片 URL..."
-                            value={aboutAvatars.team[name] || ''}
-                            onChange={(e) => {
-                              const updated = { ...aboutAvatars };
-                              updated.team[name] = e.target.value;
-                              setAboutAvatars(updated);
-                            }}
-                            className="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-[11px] focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                          />
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={async (e) => {
-                              if (!e.target.files || e.target.files.length === 0) return;
-                              const file = e.target.files[0];
-                              const url = await uploadToCloudinary(file);
-                              if (url) {
-                                const updated = { ...aboutAvatars };
-                                updated.team[name] = url;
-                                setAboutAvatars(updated);
-                                alert('✨ 團隊夥伴頭像上傳成功！');
-                              } else {
-                                alert('上傳失敗，請檢查網路或 Cloudinary');
-                              }
-                            }}
-                            className="text-[10px] text-slate-500 block file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-[10px] file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              {renderCategoryManager('常務董事會成員管理', 'board', 'text-pink-500')}
+              {renderCategoryManager('董事會成員管理', 'directors', 'text-blue-500')}
+              {renderCategoryManager('榮譽董事成員管理', 'honorary', 'text-teal-500')}
+              {renderCategoryManager('團隊夥伴成員管理', 'team', 'text-orange-500')}
 
               <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm flex items-center justify-between">
                 <div className="space-y-1">
@@ -2487,8 +2367,8 @@ export default function AdminPanel() {
                 <button
                   onClick={async () => {
                     try {
-                      await saveConfig('about_us_avatars', aboutAvatars);
-                      alert('✨ 董事與團隊成員頭像成功保存並同步至前台！');
+                      await saveConfig('about_us_members', aboutMembers);
+                      alert('✨ 關於我們與團隊夥伴所有資料儲存同步成功！');
                     } catch (e) {
                       alert('儲存失敗，請重試');
                     }

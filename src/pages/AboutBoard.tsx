@@ -2,47 +2,35 @@ import { useState, useEffect } from 'react';
 import SubPageLayout from '../components/SubPageLayout';
 import { loadConfig } from '../utils/configLoader';
 
+interface Member {
+  name: string;
+  role: string;
+  desc: string;
+  avatar: string;
+}
+
 export default function AboutBoard() {
-  const [avatars, setAvatars] = useState<Record<string, string>>({});
+  const [boardMembers, setBoardMembers] = useState<Member[]>([]);
+  const [directors, setDirectors] = useState<Member[]>([]);
+  const [honoraryDirectors, setHonoraryDirectors] = useState<Member[]>([]);
 
   useEffect(() => {
     async function load() {
-      const data = await loadConfig<{ board: Record<string, string>; team: Record<string, string> }>('about_us_avatars');
-      if (data && data.board) {
-        setAvatars(data.board);
+      const data = await loadConfig<{
+        board: Member[];
+        directors: Member[];
+        honorary: Member[];
+        team: Member[];
+      }>('about_us_members');
+      
+      if (data) {
+        if (data.board) setBoardMembers(data.board);
+        if (data.directors) setDirectors(data.directors);
+        if (data.honorary) setHonoraryDirectors(data.honorary);
       }
     }
     load();
   }, []);
-
-  const boardMembers = [
-    { name: '陳春山', role: '董事長', desc: '國立臺北科技大學智慧財產權研究所專任教授，長期深耕公司治理、數位轉型及 ESG 永續倡議。' },
-    { name: '陳政興', role: '副董事長', desc: '均豪精密工業股份有限公司董事長暨總經理，致力於推動半導體與高階製程設備之永續智慧製造。' },
-  ];
-
-  const directors = [
-    { name: '王文山', role: '董事', desc: '產業界與科技創新專家。' },
-    { name: '何子明', role: '董事', desc: '產業界與公司治理專家。' },
-    { name: '佘日新', role: '董事', desc: '逢甲大學講座教授，專長於跨領域科技管理與永續發展策略。' },
-    { name: '吳明賢', role: '董事', desc: '國立臺灣大學醫學院附設醫院院長，推動醫療體系之綠色醫院與 ESG 實踐。' },
-    { name: '周行一', role: '董事', desc: '國立政治大學財務管理學系教授、前政治大學校長，資深財務與金融專家。' },
-    { name: '周桂田', role: '董事', desc: '國立臺灣大學國家發展研究所教授、風險社會與政策研究中心主任。' },
-    { name: '胡元輝', role: '董事', desc: '國立中正大學傳播學系教授、公共電視董事長，深耕公共傳播與社會治理。' },
-    { name: '梁又文', role: '董事', desc: '產業界與企業營運專家。' },
-    { name: '楊岳虎', role: '董事', desc: '產業界與永續發展專家。' },
-    { name: '陳孝昌', role: '董事', desc: '永續轉型顧問專家，協助企業導入 ESG 策略架構。' },
-    { name: '陳美伶', role: '董事', desc: '台灣地方創生基金會董事長、前國發會主委，深耕地方永續與數位共融。' },
-    { name: '陳雅婕', role: '董事', desc: '法律與公司治理實務專家。' },
-    { name: '潘維大', role: '董事', desc: '東吳大學校長，法律與高教治理專家，致力於公民教育推廣。' },
-    { name: '盧秋玲', role: '董事', desc: '國立臺灣大學財務金融學系教授，專長於資產管理與企業永續投資。' },
-  ];
-
-  const honoraryDirectors = [
-    { name: '陳進財', role: '榮譽董事', desc: '穩懋半導體股份有限公司董事長，推動高科技產業綠色製造之標竿人物。' },
-    { name: '黃士軍', role: '榮譽董事', desc: '產業界與永續發展代表。' },
-    { name: '彭裕民', role: '榮譽董事', desc: '工業技術研究院副院長，專長於綠色化學與循環經濟技術研發。' },
-    { name: '王國雄', role: '榮譽董事', desc: '成真咖啡創辦人、前王品集團總經理，落實 B 型企業與社會企業共好精神。' },
-  ];
 
   return (
     <SubPageLayout>
@@ -69,8 +57,8 @@ export default function AboutBoard() {
             {boardMembers.map((member, idx) => (
               <div key={idx} className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-start space-x-4 hover:shadow-md transition-shadow duration-300">
                 <div className="w-16 h-16 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden">
-                  {avatars[member.name] ? (
-                    <img src={avatars[member.name]} alt={member.name} className="w-full h-full object-cover" />
+                  {member.avatar ? (
+                    <img src={member.avatar} alt={member.name} className="w-full h-full object-cover" />
                   ) : (
                     <svg className="w-8 h-8 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
@@ -96,8 +84,8 @@ export default function AboutBoard() {
             {directors.map((member, idx) => (
               <div key={idx} className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-start space-x-4 hover:shadow-md transition-shadow duration-300">
                 <div className="w-14 h-14 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden">
-                  {avatars[member.name] ? (
-                    <img src={avatars[member.name]} alt={member.name} className="w-full h-full object-cover" />
+                  {member.avatar ? (
+                    <img src={member.avatar} alt={member.name} className="w-full h-full object-cover" />
                   ) : (
                     <svg className="w-7 h-7 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
@@ -123,8 +111,8 @@ export default function AboutBoard() {
             {honoraryDirectors.map((member, idx) => (
               <div key={idx} className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-start space-x-3 hover:shadow-md transition-shadow duration-300">
                 <div className="w-12 h-12 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden">
-                  {avatars[member.name] ? (
-                    <img src={avatars[member.name]} alt={member.name} className="w-full h-full object-cover" />
+                  {member.avatar ? (
+                    <img src={member.avatar} alt={member.name} className="w-full h-full object-cover" />
                   ) : (
                     <svg className="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
