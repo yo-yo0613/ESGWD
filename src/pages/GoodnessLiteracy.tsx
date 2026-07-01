@@ -1,19 +1,37 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import SubPageLayout from '../components/SubPageLayout';
+import { useLanguage } from '../context/LanguageContext';
+import { loadConfig } from '../utils/configLoader';
+import { initialGoodnessLiteracyPage } from '../data/siteProjectsInitialData';
+import type { GoodnessLiteracyPageData } from '../data/siteProjectsInitialData';
 
 export default function GoodnessLiteracy() {
+  const { language, t } = useLanguage();
+  const [pageData, setPageData] = useState<GoodnessLiteracyPageData>(initialGoodnessLiteracyPage);
   const [activeTab, setActiveTab] = useState<'plan' | 'citizen' | 'tools'>('plan');
+
+  const bi = (zh: string, en?: string) => (language === 'en' && en) ? en : zh;
+
+  useEffect(() => {
+    const fetchConfig = async () => {
+      const data = await loadConfig<GoodnessLiteracyPageData>('page_goodness_literacy');
+      if (data) {
+        setPageData(data);
+      }
+    };
+    fetchConfig();
+  }, []);
 
   return (
     <SubPageLayout>
-      <div className="space-y-12 animate-fade-in">
+      <div className="space-y-12 animate-fade-in pb-12">
         {/* Breadcrumb / Title */}
         <div className="border-b border-slate-200 pb-6">
           <span className="text-xs font-bold text-brand-orange uppercase tracking-widest block mb-2">
-            服務專案
+            {t('nav.services')}
           </span>
           <h1 className="text-3xl md:text-4xl font-heading font-black text-slate-800 tracking-wide">
-            良善素養教育 (Goodness Literacy)
+            {bi('良善素養教育', 'Goodness Literacy')}
           </h1>
         </div>
 
@@ -27,7 +45,7 @@ export default function GoodnessLiteracy() {
                 : 'border-transparent text-slate-400 hover:text-slate-700'
             }`}
           >
-            良善素養教育計畫
+            {bi('良善素養教育計畫', 'Goodness Literacy Plan')}
           </button>
           <button
             onClick={() => setActiveTab('citizen')}
@@ -37,7 +55,7 @@ export default function GoodnessLiteracy() {
                 : 'border-transparent text-slate-400 hover:text-slate-700'
             }`}
           >
-            良善世界公民專案
+            {bi('良善世界公民專案', 'Goodness World Citizen Program')}
           </button>
           <button
             onClick={() => setActiveTab('tools')}
@@ -47,7 +65,7 @@ export default function GoodnessLiteracy() {
                 : 'border-transparent text-slate-400 hover:text-slate-700'
             }`}
           >
-            善行工具與典範小學
+            {bi('善行工具與典範小學', 'Tools & Model Schools')}
           </button>
         </div>
 
@@ -55,65 +73,61 @@ export default function GoodnessLiteracy() {
         <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
           {activeTab === 'plan' && (
             <div className="space-y-4 animate-fade-in">
-              <h2 className="text-lg font-black text-slate-800">良善素養教育計畫 介紹</h2>
-              <p className="text-slate-600 text-xs leading-relaxed">
-                良善素養教育的核心在於啟發學童與青少年的同理心、正向信念與社會責任感。本基金會積極推動「百萬學童：世界公民素養教育計畫」，舉辦「心良善・新校園講座」，融入社會情緒學習（SEL），引導學子在日常生活中養成主動關懷他人的習慣。
+              <h2 className="text-lg font-black text-slate-800">
+                {bi(pageData.planTitle, pageData.planTitle_en)}
+              </h2>
+              <p className="text-slate-600 text-xs leading-relaxed font-light">
+                {bi(pageData.planDesc, pageData.planDesc_en)}
               </p>
-              <p className="text-slate-600 text-xs leading-relaxed">
-                本計畫目前已與全台數十所小學建立緊密合作，推動融入式教學，提供師資培訓與教材研發支持，為孩子的品格成長與公民素養打下堅實基礎。
+              <p className="text-slate-600 text-xs leading-relaxed font-light">
+                {bi(pageData.planDescExtra, pageData.planDescExtra_en)}
               </p>
               <div className="pt-4 border-t border-slate-100 flex flex-wrap gap-4 text-[10px] text-slate-400 font-bold">
-                <span>🎯 計畫指標：推廣優質教育 (SDG 4)</span>
+                <span>{bi(pageData.planTarget, pageData.planTarget_en)}</span>
                 <span>‧</span>
-                <span>🏫 已合作校園：50+ 所小學</span>
+                <span>{bi(pageData.planSchoolCount, pageData.planSchoolCount_en)}</span>
               </div>
             </div>
           )}
 
           {activeTab === 'citizen' && (
             <div className="space-y-4 animate-fade-in">
-              <h2 className="text-lg font-black text-slate-800">良善世界公民專案計畫 介紹</h2>
-              <p className="text-slate-600 text-xs leading-relaxed">
-                「良善世界公民專案」是一個讓孩子動手實踐社會責任的平台。我們在校園推動「良善卡活動」，結合社會情緒學習（SEL）課程，鼓勵學童組成小團隊，發掘身邊或社區中需要被改善的社會與環境痛點（例如：關懷長者、垃圾減量、社區綠化等），並自主策劃行動方案。
+              <h2 className="text-lg font-black text-slate-800">
+                {bi(pageData.citizenTitle, pageData.citizenTitle_en)}
+              </h2>
+              <p className="text-slate-600 text-xs leading-relaxed font-light">
+                {bi(pageData.citizenDesc, pageData.citizenDesc_en)}
               </p>
-              <p className="text-slate-600 text-xs leading-relaxed">
-                透過「做中學」與實地實踐的過程，讓孩子們體驗自己也有改變世界的力量，將同理心與良善理念真正落實為解決實際問題的公民行動。
+              <p className="text-slate-600 text-xs leading-relaxed font-light">
+                {bi(pageData.citizenDescExtra, pageData.citizenDescExtra_en)}
               </p>
               <div className="pt-4 border-t border-slate-100 flex flex-wrap gap-4 text-[10px] text-slate-400 font-bold">
-                <span>🌍 專案指標：社會責任感與品格實踐</span>
+                <span>{bi(pageData.citizenTarget, pageData.citizenTarget_en)}</span>
                 <span>‧</span>
-                <span>💡 累積行動方案：120+ 件</span>
+                <span>{bi(pageData.citizenCount, pageData.citizenCount_en)}</span>
               </div>
             </div>
           )}
 
           {activeTab === 'tools' && (
             <div className="space-y-6 animate-fade-in">
-              <h2 className="text-lg font-black text-slate-800">善行卡、善行手冊與典範小學 介紹</h2>
+              <h2 className="text-lg font-black text-slate-800">
+                {bi('善行卡、善行手冊與典範小學 介紹', 'Goodness Cards, Handbooks & Role-Model Schools')}
+              </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-                  <span className="text-xl">🃏</span>
-                  <h3 className="text-xs font-bold text-slate-800">善行卡</h3>
-                  <p className="text-slate-500 text-[11px] leading-relaxed">
-                    精美設計的每日挑戰小卡，例如「向打掃阿姨道謝」、「隨手撿起走廊垃圾」，以遊戲化方式引導孩子做出良善舉動。
-                  </p>
-                </div>
-
-                <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-                  <span className="text-xl">📒</span>
-                  <h3 className="text-xs font-bold text-slate-800">善行手冊</h3>
-                  <p className="text-slate-500 text-[11px] leading-relaxed">
-                    供學童記錄每日善行與反思的心得日記，輔以趣味漫畫引導與品格故事，讓良善成為孩子一生的生活核心習慣。
-                  </p>
-                </div>
-
-                <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-                  <span className="text-xl">🏫</span>
-                  <h3 className="text-xs font-bold text-slate-800">典範小學</h3>
-                  <p className="text-slate-500 text-[11px] leading-relaxed">
-                    全面落實良善教育、營造溫暖共融校園風氣的示範學校。我們定期評選出典範校區，推廣其校本課程經驗。
-                  </p>
-                </div>
+                {pageData.tools && pageData.tools.map((tool, idx) => (
+                  <div key={idx} className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 flex flex-col justify-between hover:scale-[1.02] transition-transform duration-300">
+                    <div className="space-y-2">
+                      <span className="text-xl block">{tool.emoji || '🎒'}</span>
+                      <h3 className="text-xs font-bold text-slate-800">
+                        {bi(tool.title, tool.title_en)}
+                      </h3>
+                      <p className="text-slate-500 text-[11px] leading-relaxed font-light">
+                        {bi(tool.desc, tool.desc_en)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}

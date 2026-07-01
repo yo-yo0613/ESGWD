@@ -1,58 +1,49 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import SubPageLayout from '../components/SubPageLayout';
-
-interface ConcertEvent {
-  year: number;
-  title: string;
-  theme: string;
-  location: string;
-  img: string;
-  desc: string;
-}
+import { useLanguage } from '../context/LanguageContext';
+import { loadConfig } from '../utils/configLoader';
+import { initialAnnualConcertPage } from '../data/siteProjectsInitialData';
+import type { AnnualConcertPageData } from '../data/siteProjectsInitialData';
 
 export default function AnnualConcert() {
-  const years = [2026, 2025, 2024];
+  const { language, t } = useLanguage();
+  const [pageData, setPageData] = useState<AnnualConcertPageData>(initialAnnualConcertPage);
   const [selectedYear, setSelectedYear] = useState(2026);
 
-  const concerts: ConcertEvent[] = [
-    {
-      year: 2026,
-      title: '2026 世界公民年度慈善音樂會：《綠之迴響》',
-      theme: '環境共生與大地樂章',
-      location: '台北國家音樂廳',
-      img: 'https://images.unsplash.com/photo-1514306191717-452ec28c7814?q=80&w=600&auto=format&fit=crop',
-      desc: '本屆音樂會以綠色大地為創作靈感，邀請國家交響樂團與知名環保歌手跨界合演，門票盈餘全數投入良善偏鄉教育基金。'
-    },
-    {
-      year: 2025,
-      title: '2025 世界公民年度慈善音樂會：《藍色星球》',
-      theme: '守護海洋與永續水資源',
-      location: '衛武營國家藝術文化中心',
-      img: 'https://images.unsplash.com/photo-1465847899084-d164df4dedc6?q=80&w=600&auto=format&fit=crop',
-      desc: '2025 年以水資源與海洋保育為核心主題，藉由管弦樂演奏模擬潮汐與海洋呼吸，喚醒大眾對於水生態系統保護之重視。'
-    },
-    {
-      year: 2024,
-      title: '2024 世界公民首屆慈善音樂會：《和諧共存》',
-      theme: '人與自然的和諧對話',
-      location: '台中國家歌劇院',
-      img: 'https://images.unsplash.com/photo-1469228238522-7a89551ee2fc?q=80&w=600&auto=format&fit=crop',
-      desc: '首屆慈善音樂會正式啟動，集結海內外優秀青年鋼琴家與大提琴家，用音符串起跨世代的地球守護約定。'
-    }
-  ];
+  const bi = (zh: string, en?: string) => (language === 'en' && en) ? en : zh;
 
-  const filteredConcert = concerts.find(c => c.year === selectedYear);
+  useEffect(() => {
+    const fetchConfig = async () => {
+      const data = await loadConfig<AnnualConcertPageData>('page_annual_concert');
+      if (data) {
+        setPageData(data);
+        if (data.concerts && data.concerts.length > 0) {
+          const yearsList = Array.from(new Set(data.concerts.map(c => c.year))).sort((a, b) => b - a);
+          setSelectedYear(yearsList[0]);
+        }
+      }
+    };
+    fetchConfig();
+  }, []);
+
+  const years = pageData.concerts
+    ? Array.from(new Set(pageData.concerts.map(c => c.year))).sort((a, b) => b - a)
+    : [2026, 2025, 2024];
+
+  const filteredConcert = pageData.concerts
+    ? pageData.concerts.find(c => c.year === selectedYear)
+    : null;
 
   return (
     <SubPageLayout>
-      <div className="space-y-12 animate-fade-in">
+      <div className="space-y-12 animate-fade-in pb-12">
         {/* Breadcrumb / Title */}
         <div className="border-b border-slate-200 pb-6">
           <span className="text-xs font-bold text-brand-orange uppercase tracking-widest block mb-2">
-            服務專案
+            {t('nav.services')}
           </span>
           <h1 className="text-3xl md:text-4xl font-heading font-black text-slate-800 tracking-wide">
-            世界公民年度音樂會 (Annual Concert)
+            {bi('世界公民年度音樂會', 'Annual Charity Concert')}
           </h1>
         </div>
 
@@ -60,27 +51,29 @@ export default function AnnualConcert() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           <div className="lg:col-span-2 space-y-6">
             <h2 className="text-xl font-bold text-slate-800">
-              用音樂傳遞愛與永續的能量，融化人心，串聯希望。
+              {bi(pageData.introTitle, pageData.introTitle_en)}
             </h2>
-            <p className="text-slate-600 leading-relaxed text-sm">
-              世界公民數位治理基金會每年定期舉辦年度慈善音樂會，邀請國內外頂尖樂團與藝術家共襄盛舉。音樂會扣除製作成本後的所得，皆投入良善教育、環境永續等公益專案，以音樂化作實質的社會變革行動。
+            <p className="text-slate-655 leading-relaxed text-sm font-light">
+              {bi(pageData.introDesc, pageData.introDesc_en)}
             </p>
           </div>
           <div className="p-6 rounded-2xl bg-slate-100 border border-slate-200 text-center space-y-2">
-            <span className="text-[10px] text-slate-400 font-bold block uppercase tracking-widest">慈善盈餘投向</span>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              用於良善素養教育推廣、善行手冊教材研發印製、偏鄉校園關懷與綠色公民獎學金。
+            <span className="text-[10px] text-slate-400 font-bold block uppercase tracking-widest">
+              {bi('慈善盈餘投向', 'PROCEEDS DESTINATION')}
+            </span>
+            <p className="text-xs text-slate-600 leading-relaxed font-light">
+              {bi(pageData.surplusDesc, pageData.surplusDesc_en)}
             </p>
           </div>
         </div>
 
         {/* Year filter and content */}
         <div className="space-y-6">
-          <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-3 gap-4">
             <h3 className="text-sm font-extrabold text-slate-800 tracking-wide">
-              各年度音樂會精選回顧
+              {bi('各年度音樂會精選回顧', 'Annual Concert Highlights & Review')}
             </h3>
-            <div className="flex space-x-2">
+            <div className="flex flex-wrap gap-2">
               {years.map(yr => (
                 <button
                   key={yr}
@@ -91,36 +84,43 @@ export default function AnnualConcert() {
                       : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
                   }`}
                 >
-                  {yr} 年
+                  {yr} {bi('年', 'Year')}
                 </button>
               ))}
             </div>
           </div>
 
           {/* Featured concert item */}
-          {filteredConcert && (
-            <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          {filteredConcert ? (
+            <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm grid grid-cols-1 lg:grid-cols-2 gap-8 items-center hover:shadow-md transition-shadow duration-300">
               <div className="aspect-[4/3] w-full bg-slate-100 overflow-hidden relative lg:rounded-l-3xl">
-                <img src={filteredConcert.img} alt={filteredConcert.title} className="object-cover w-full h-full hover:scale-105 transition-transform duration-500" />
+                <img src={filteredConcert.img} alt={bi(filteredConcert.title, filteredConcert.title_en)} className="object-cover w-full h-full hover:scale-105 transition-transform duration-500" />
               </div>
               <div className="p-8 space-y-4">
                 <span className="inline-block px-3 py-1 bg-amber-100 text-amber-800 text-[10px] font-bold rounded-full uppercase tracking-wider">
-                  {filteredConcert.year} 慈善義演
+                  {filteredConcert.year} {bi('慈善義演', 'Charity Recital')}
                 </span>
                 <h4 className="text-xl font-black text-slate-800 leading-tight">
-                  {filteredConcert.title}
+                  {bi(filteredConcert.title, filteredConcert.title_en)}
                 </h4>
-                <div className="space-y-1 text-xs text-slate-500 font-semibold">
-                  <p>🎵 主題：{filteredConcert.theme}</p>
-                  <p>📍 地點：{filteredConcert.location}</p>
+                <div className="space-y-1.5 text-xs text-slate-500 font-semibold">
+                  <p>🎵 {bi('主題：', 'Theme: ')}{bi(filteredConcert.theme, filteredConcert.theme_en)}</p>
+                  <p>📍 {bi('地點：', 'Venue: ')}{bi(filteredConcert.location, filteredConcert.location_en)}</p>
                 </div>
-                <p className="text-slate-600 text-xs leading-relaxed">
-                  {filteredConcert.desc}
+                <p className="text-slate-655 text-xs leading-relaxed font-light">
+                  {bi(filteredConcert.desc, filteredConcert.desc_en)}
                 </p>
-                <button className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-md transition-all duration-300">
-                  回顧音樂會精彩剪影
+                <button 
+                  onClick={() => alert(language === 'en' ? 'Showing concert photo album... (Simulation)' : '顯示音樂會相簿中... (模擬)')}
+                  className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-md transition-all duration-300"
+                >
+                  {bi('回顧音樂會精彩剪影', 'View Concert Gallery')}
                 </button>
               </div>
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-dashed border-slate-200 py-16 text-center text-slate-400 text-xs">
+              {bi('此年度暫無音樂會紀錄。', 'No concert record for this year.')}
             </div>
           )}
         </div>

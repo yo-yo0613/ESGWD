@@ -18,6 +18,23 @@ import type {
   DonationPlanData 
 } from '../data/siteInitialData';
 
+import {
+  initialFutureAcademyPage,
+  initialGoldenConstantPage,
+  initialGoodnessLiteracyPage,
+  initialAnnualConcertPage
+} from '../data/siteProjectsInitialData';
+import type {
+  FutureAcademyPageData,
+  GoldenConstantPageData,
+  GoodnessLiteracyPageData,
+  AnnualConcertPageData,
+  CourseItem,
+  GalleryItem,
+  AwardEventItem,
+  LiteracyToolItem,
+  ConcertEventItem
+} from '../data/siteProjectsInitialData';
 import { 
   LayoutDashboard, 
   Grid, 
@@ -116,6 +133,13 @@ export default function AdminPanel() {
   const [bookCta, setBookCta] = useState<BookCtaData | null>(null);
   const [donationPlans, setDonationPlans] = useState<DonationPlanData[]>([]);
 
+  // Project Pages Option A CMS States
+  const [futureAcademyPage, setFutureAcademyPage] = useState<FutureAcademyPageData>(initialFutureAcademyPage);
+  const [goldenConstantPage, setGoldenConstantPage] = useState<GoldenConstantPageData>(initialGoldenConstantPage);
+  const [goodnessLiteracyPage, setGoodnessLiteracyPage] = useState<GoodnessLiteracyPageData>(initialGoodnessLiteracyPage);
+  const [annualConcertPage, setAnnualConcertPage] = useState<AnnualConcertPageData>(initialAnnualConcertPage);
+  const [projectsSubTab, setProjectsSubTab] = useState<'summary' | 'future_academy' | 'golden_constant' | 'goodness_literacy' | 'annual_concert'>('summary');
+
   // Generic Image Upload State
   const [uploadingField, setUploadingField] = useState<string | null>(null);
 
@@ -169,7 +193,11 @@ export default function AdminPanel() {
     setUploadingBentoImage(false);
   };
 
-  const handleCloudinaryFieldUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'hero' | 'news', index?: number) => {
+  const handleCloudinaryFieldUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    type: 'hero' | 'news' | 'fa-gallery' | 'gc-event' | 'ac-concert',
+    index?: number
+  ) => {
     if (!e.target.files || e.target.files.length === 0) return;
     const key = `${type}-${index !== undefined ? index : 'new'}`;
     setUploadingField(key);
@@ -182,6 +210,18 @@ export default function AdminPanel() {
         setHeroSlides(updated);
       } else if (type === 'news') {
         setNewNewsImage(url);
+      } else if (type === 'fa-gallery' && index !== undefined) {
+        const gallery = [...futureAcademyPage.gallery];
+        gallery[index] = { ...gallery[index], url };
+        setFutureAcademyPage(prev => ({ ...prev, gallery }));
+      } else if (type === 'gc-event' && index !== undefined) {
+        const events = [...goldenConstantPage.events];
+        events[index] = { ...events[index], img: url };
+        setGoldenConstantPage(prev => ({ ...prev, events }));
+      } else if (type === 'ac-concert' && index !== undefined) {
+        const concerts = [...annualConcertPage.concerts];
+        concerts[index] = { ...concerts[index], img: url };
+        setAnnualConcertPage(prev => ({ ...prev, concerts }));
       }
       alert('✨ 圖片成功上傳至 Cloudinary 雲端！');
     } else {
@@ -268,6 +308,19 @@ export default function AdminPanel() {
 
     const lsu = await loadConfig<string>('looker_studio_url');
     if (lsu) setLookerStudioUrl(lsu);
+
+    // Option A Project Subpages configs loaders
+    const faPage = await loadConfig<FutureAcademyPageData>('page_future_academy');
+    if (faPage) setFutureAcademyPage(faPage);
+
+    const gcPage = await loadConfig<GoldenConstantPageData>('page_golden_constant');
+    if (gcPage) setGoldenConstantPage(gcPage);
+
+    const glPage = await loadConfig<GoodnessLiteracyPageData>('page_goodness_literacy');
+    if (glPage) setGoodnessLiteracyPage(glPage);
+
+    const acPage = await loadConfig<AnnualConcertPageData>('page_annual_concert');
+    if (acPage) setAnnualConcertPage(acPage);
 
     const members = await loadConfig<AboutUsMembers>('about_us_members');
     if (members) setAboutMembers(members);
@@ -546,6 +599,192 @@ export default function AdminPanel() {
     } catch (err) {
       alert('儲存失敗');
     }
+  };
+
+  // --- SAVE project pages states to database ---
+  const handleSaveFutureAcademy = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await saveConfig('page_future_academy', futureAcademyPage);
+      alert('✨ 未來學院頁面設定已儲存！');
+    } catch (err) { alert('儲存失敗'); }
+  };
+
+  const handleSaveGoldenConstant = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await saveConfig('page_golden_constant', goldenConstantPage);
+      alert('✨ 金恆獎頁面設定已儲存！');
+    } catch (err) { alert('儲存失敗'); }
+  };
+
+  const handleSaveGoodnessLiteracy = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await saveConfig('page_goodness_literacy', goodnessLiteracyPage);
+      alert('✨ 良善素養教育頁面設定已儲存！');
+    } catch (err) { alert('儲存失敗'); }
+  };
+
+  const handleSaveAnnualConcert = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await saveConfig('page_annual_concert', annualConcertPage);
+      alert('✨ 年度音樂會頁面設定已儲存！');
+    } catch (err) { alert('儲存失敗'); }
+  };
+
+  // Helper nested states modifiers for Future Academy
+  const updateFutureAcademyField = (field: keyof FutureAcademyPageData, value: any) => {
+    setFutureAcademyPage(prev => ({ ...prev, [field]: value }));
+  };
+
+  const updateFutureAcademyCourse = (index: number, field: keyof CourseItem, value: string) => {
+    const courses = [...futureAcademyPage.courses];
+    courses[index] = { ...courses[index], [field]: value };
+    setFutureAcademyPage(prev => ({ ...prev, courses }));
+  };
+
+  const handleFutureAcademyAddCourse = () => {
+    const newCourse: CourseItem = {
+      icon: '📚',
+      title: '新課程標題',
+      title_en: 'New Course Title',
+      desc: '新課程簡介說明',
+      desc_en: 'New course description'
+    };
+    setFutureAcademyPage(prev => ({
+      ...prev,
+      courses: [...prev.courses, newCourse]
+    }));
+  };
+
+  const handleFutureAcademyDeleteCourse = (index: number) => {
+    const courses = futureAcademyPage.courses.filter((_, i) => i !== index);
+    setFutureAcademyPage(prev => ({ ...prev, courses }));
+  };
+
+  const updateFutureAcademyGalleryItem = (index: number, field: keyof GalleryItem, value: string) => {
+    const gallery = [...futureAcademyPage.gallery];
+    gallery[index] = { ...gallery[index], [field]: value };
+    setFutureAcademyPage(prev => ({ ...prev, gallery }));
+  };
+
+  const handleFutureAcademyAddGalleryItem = () => {
+    const newItem: GalleryItem = {
+      url: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80',
+      title: '新活動剪影',
+      title_en: 'New Event Highlight',
+      desc: '新活動剪影簡介說明',
+      desc_en: 'New event description'
+    };
+    setFutureAcademyPage(prev => ({
+      ...prev,
+      gallery: [...prev.gallery, newItem]
+    }));
+  };
+
+  const handleFutureAcademyDeleteGalleryItem = (index: number) => {
+    const gallery = futureAcademyPage.gallery.filter((_, i) => i !== index);
+    setFutureAcademyPage(prev => ({ ...prev, gallery }));
+  };
+
+  // Helper nested states modifiers for Golden Constant
+  const updateGoldenConstantField = (field: keyof GoldenConstantPageData, value: any) => {
+    setGoldenConstantPage(prev => ({ ...prev, [field]: value }));
+  };
+
+  const updateGoldenConstantEvent = (index: number, field: keyof AwardEventItem, value: any) => {
+    const events = [...goldenConstantPage.events];
+    events[index] = { ...events[index], [field]: value };
+    setGoldenConstantPage(prev => ({ ...prev, events }));
+  };
+
+  const handleGoldenConstantAddEvent = () => {
+    const newEvent: AwardEventItem = {
+      year: new Date().getFullYear(),
+      title: '新得獎活動紀錄標題',
+      title_en: 'New Award Event Title',
+      category: '年度盛事',
+      category_en: 'Annual Event',
+      summary: '新得獎活動特輯簡介說明',
+      summary_en: 'New award event summary details',
+      img: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=600&auto=format&fit=crop'
+    };
+    setGoldenConstantPage(prev => ({
+      ...prev,
+      events: [...prev.events, newEvent]
+    }));
+  };
+
+  const handleGoldenConstantDeleteEvent = (index: number) => {
+    const events = goldenConstantPage.events.filter((_, i) => i !== index);
+    setGoldenConstantPage(prev => ({ ...prev, events }));
+  };
+
+  // Helper nested states modifiers for Goodness Literacy
+  const updateGoodnessLiteracyField = (field: keyof GoodnessLiteracyPageData, value: any) => {
+    setGoodnessLiteracyPage(prev => ({ ...prev, [field]: value }));
+  };
+
+  const updateGoodnessLiteracyTool = (index: number, field: keyof LiteracyToolItem, value: string) => {
+    const tools = [...goodnessLiteracyPage.tools];
+    tools[index] = { ...tools[index], [field]: value };
+    setGoodnessLiteracyPage(prev => ({ ...prev, tools }));
+  };
+
+  const handleGoodnessLiteracyAddTool = () => {
+    const newTool: LiteracyToolItem = {
+      emoji: '🃏',
+      title: '新工具名稱',
+      title_en: 'New Tool Title',
+      desc: '新工具教材說明文字',
+      desc_en: 'New tool learning description'
+    };
+    setGoodnessLiteracyPage(prev => ({
+      ...prev,
+      tools: [...prev.tools, newTool]
+    }));
+  };
+
+  const handleGoodnessLiteracyDeleteTool = (index: number) => {
+    const tools = goodnessLiteracyPage.tools.filter((_, i) => i !== index);
+    setGoodnessLiteracyPage(prev => ({ ...prev, tools }));
+  };
+
+  // Helper nested states modifiers for Annual Concert
+  const updateAnnualConcertField = (field: keyof AnnualConcertPageData, value: any) => {
+    setAnnualConcertPage(prev => ({ ...prev, [field]: value }));
+  };
+
+  const updateAnnualConcertEvent = (index: number, field: keyof ConcertEventItem, value: any) => {
+    const concerts = [...annualConcertPage.concerts];
+    concerts[index] = { ...concerts[index], [field]: value };
+    setAnnualConcertPage(prev => ({ ...prev, concerts }));
+  };
+
+  const handleAnnualConcertAddEvent = () => {
+    const newEvent: ConcertEventItem = {
+      year: new Date().getFullYear(),
+      title: '新年度慈善音樂會標題',
+      title_en: 'New Annual Concert Title',
+      theme: '環境共生與大地樂章',
+      theme_en: 'Environmental Coexistence',
+      location: '台北國家音樂廳',
+      location_en: 'National Concert Hall, Taipei',
+      img: 'https://images.unsplash.com/photo-1514306191717-452ec28c7814?q=80&w=600&auto=format&fit=crop',
+      desc: '音樂會簡介與演出回顧說明。',
+      desc_en: 'Concert concert reviews and charity funds description.'
+    };
+    setAnnualConcertPage(prev => ({
+      ...prev,
+      concerts: [...prev.concerts, newEvent]
+    }));
+  };
+
+  const handleAnnualConcertDeleteEvent = (index: number) => {
+    const concerts = annualConcertPage.concerts.filter((_, i) => i !== index);
+    setAnnualConcertPage(prev => ({ ...prev, concerts }));
   };
 
   // Helper nested states modifiers
@@ -1659,167 +1898,1239 @@ export default function AdminPanel() {
 
           {/* 4. CORE PROJECTS CMS */}
           {activeTab === 'projects' && (
-            <form onSubmit={handleSaveProjects} className="space-y-8 animate-fade-in">
-              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                <div className="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
-                  <h3 className="text-sm font-extrabold text-slate-800">三大核心專案與數據卡片設定</h3>
-                  <span className="text-xs text-slate-400">管理首頁的三個大型倡導專案</span>
-                </div>
+            <div className="space-y-6 animate-fade-in">
+              {/* Secondary Sub-tab Bar */}
+              <div className="flex flex-wrap border-b border-slate-200 mb-6 gap-3 pb-1">
+                <button
+                  type="button"
+                  onClick={() => setProjectsSubTab('summary')}
+                  className={`pb-3 px-2 text-xs font-extrabold border-b-2 transition-all ${
+                    projectsSubTab === 'summary' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700'
+                  }`}
+                >
+                  首頁專案摘要
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setProjectsSubTab('future_academy')}
+                  className={`pb-3 px-2 text-xs font-extrabold border-b-2 transition-all ${
+                    projectsSubTab === 'future_academy' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700'
+                  }`}
+                >
+                  未來學院專頁
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setProjectsSubTab('golden_constant')}
+                  className={`pb-3 px-2 text-xs font-extrabold border-b-2 transition-all ${
+                    projectsSubTab === 'golden_constant' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700'
+                  }`}
+                >
+                  金恆獎專頁
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setProjectsSubTab('goodness_literacy')}
+                  className={`pb-3 px-2 text-xs font-extrabold border-b-2 transition-all ${
+                    projectsSubTab === 'goodness_literacy' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700'
+                  }`}
+                >
+                  良善素養專頁
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setProjectsSubTab('annual_concert')}
+                  className={`pb-3 px-2 text-xs font-extrabold border-b-2 transition-all ${
+                    projectsSubTab === 'annual_concert' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700'
+                  }`}
+                >
+                  年度音樂會專頁
+                </button>
+              </div>
 
-                <div className="space-y-8">
-                  {projectsList.map((project, idx) => (
-                    <div key={project.id || idx} className="p-6 rounded-2xl bg-slate-50 border border-slate-200/60 space-y-4 relative">
-                      <div className="absolute top-4 left-4 bg-brand-navy text-brand-amber font-bold text-xs px-2.5 py-1 rounded-lg">
-                        專案卡片 {idx + 1}
-                      </div>
+              {/* Sub-tab 1: Summary */}
+              {projectsSubTab === 'summary' && (
+                <form onSubmit={handleSaveProjects} className="space-y-6">
+                  <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                    <div className="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
+                      <h3 className="text-sm font-extrabold text-slate-800">三大核心專案與數據卡片設定</h3>
+                      <span className="text-xs text-slate-400">管理首頁的三個大型倡導專案</span>
+                    </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6">
-                        {/* Title, Subtitle */}
-                        <div className="space-y-4">
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-1">
-                              <label className="text-xs font-bold text-slate-600">專案標題 (繁中) *</label>
-                              <input
-                                type="text"
-                                value={project.title}
-                                onChange={(e) => updateProjectField(idx, 'title', e.target.value)}
-                                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
-                                required
-                              />
-                            </div>
-                            <div className="space-y-1">
-                              <label className="text-xs font-bold text-slate-600">Project Title (English)</label>
-                              <input
-                                type="text"
-                                value={project.title_en || ''}
-                                onChange={(e) => updateProjectField(idx, 'title_en', e.target.value)}
-                                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
-                              />
-                            </div>
+                    <div className="space-y-8">
+                      {projectsList.map((project, idx) => (
+                        <div key={project.id || idx} className="p-6 rounded-2xl bg-slate-50 border border-slate-200/60 space-y-4 relative">
+                          <div className="absolute top-4 left-4 bg-brand-navy text-brand-amber font-bold text-xs px-2.5 py-1 rounded-lg">
+                            專案卡片 {idx + 1}
                           </div>
 
-                          <div className="space-y-1">
-                            <label className="text-xs font-bold text-slate-600">簡介描述 (繁中) *</label>
-                            <textarea
-                              value={project.subtitle}
-                              onChange={(e) => updateProjectField(idx, 'subtitle', e.target.value)}
-                              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs h-20 resize-none focus:ring-1 focus:ring-blue-500 focus:outline-none"
-                              required
-                            />
-                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6">
+                            <div className="space-y-4">
+                              <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-1">
+                                  <label className="text-xs font-bold text-slate-600">專案標題 (繁中) *</label>
+                                  <input
+                                    type="text"
+                                    value={project.title}
+                                    onChange={(e) => updateProjectField(idx, 'title', e.target.value)}
+                                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                                    required
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <label className="text-xs font-bold text-slate-600">Project Title (English)</label>
+                                  <input
+                                    type="text"
+                                    value={project.title_en || ''}
+                                    onChange={(e) => updateProjectField(idx, 'title_en', e.target.value)}
+                                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                                  />
+                                </div>
+                              </div>
 
-                          <div className="space-y-1">
-                            <label className="text-xs font-bold text-slate-600">Description (English)</label>
-                            <textarea
-                              value={project.subtitle_en || ''}
-                              onChange={(e) => updateProjectField(idx, 'subtitle_en', e.target.value)}
-                              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs h-20 resize-none focus:ring-1 focus:ring-blue-500 focus:outline-none"
-                            />
-                          </div>
+                              <div className="space-y-1">
+                                <label className="text-xs font-bold text-slate-600">簡介描述 (繁中) *</label>
+                                <textarea
+                                  value={project.subtitle}
+                                  onChange={(e) => updateProjectField(idx, 'subtitle', e.target.value)}
+                                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs h-20 resize-none focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                                  required
+                                />
+                              </div>
 
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-1">
-                              <label className="text-xs font-bold text-slate-600">按鈕連結文字 (繁中)</label>
-                              <input
-                                type="text"
-                                value={project.ctaText}
-                                onChange={(e) => updateProjectField(idx, 'ctaText', e.target.value)}
-                                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
-                              />
+                              <div className="space-y-1">
+                                <label className="text-xs font-bold text-slate-600">Description (English)</label>
+                                <textarea
+                                  value={project.subtitle_en || ''}
+                                  onChange={(e) => updateProjectField(idx, 'subtitle_en', e.target.value)}
+                                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs h-20 resize-none focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                                />
+                              </div>
+
+                              <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-1">
+                                  <label className="text-xs font-bold text-slate-600">按鈕連結文字 (繁中)</label>
+                                  <input
+                                    type="text"
+                                    value={project.ctaText}
+                                    onChange={(e) => updateProjectField(idx, 'ctaText', e.target.value)}
+                                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <label className="text-xs font-bold text-slate-600">Button Text (English)</label>
+                                  <input
+                                    type="text"
+                                    value={project.ctaText_en || ''}
+                                    onChange={(e) => updateProjectField(idx, 'ctaText_en', e.target.value)}
+                                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                                  />
+                                </div>
+                              </div>
+
+                              <div className="space-y-1">
+                                <label className="text-xs font-bold text-slate-600">代表圖示名稱 (Lucide Icon)</label>
+                                <select
+                                  value={project.iconName}
+                                  onChange={(e) => updateProjectField(idx, 'iconName', e.target.value)}
+                                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                                >
+                                  <option value="Award">Award (金恆獎)</option>
+                                  <option value="BookOpen">BookOpen (教育書籍)</option>
+                                  <option value="Music">Music (音樂會)</option>
+                                  <option value="Shield">Shield (防護盾)</option>
+                                  <option value="Zap">Zap (閃電)</option>
+                                  <option value="Star">Star (星號)</option>
+                                </select>
+                              </div>
                             </div>
-                            <div className="space-y-1">
-                              <label className="text-xs font-bold text-slate-600">Button Text (English)</label>
-                              <input
-                                type="text"
-                                value={project.ctaText_en || ''}
-                                onChange={(e) => updateProjectField(idx, 'ctaText_en', e.target.value)}
-                                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
-                              />
-                            </div>
-                          </div>
 
-                          <div className="space-y-1">
-                            <label className="text-xs font-bold text-slate-600">代表圖示名稱 (Lucide Icon)</label>
-                            <select
-                              value={project.iconName}
-                              onChange={(e) => updateProjectField(idx, 'iconName', e.target.value)}
-                              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white focus:ring-1 focus:ring-blue-500 focus:outline-none"
-                            >
-                              <option value="Award">Award (金恆獎)</option>
-                              <option value="BookOpen">BookOpen (教育書籍)</option>
-                              <option value="Music">Music (音樂會)</option>
-                              <option value="Shield">Shield (防護盾)</option>
-                              <option value="Zap">Zap (閃電)</option>
-                              <option value="Star">Star (星號)</option>
-                            </select>
+                            <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-4">
+                              <h4 className="text-xs font-bold text-slate-700">指標數據修改 (Bilingual Stats)</h4>
+                              
+                              {project.stats && project.stats.map((stat, sIdx) => (
+                                <div key={sIdx} className="p-3 bg-slate-50 border border-slate-100 rounded-xl space-y-2.5">
+                                  <span className="text-[9px] font-bold text-slate-400 block uppercase">指標數據 {sIdx + 1}</span>
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <div className="space-y-1">
+                                      <label className="text-[10px] text-slate-500 font-semibold">標籤 (繁中)</label>
+                                      <input
+                                        type="text"
+                                        value={stat.label}
+                                        onChange={(e) => updateProjectStat(idx, sIdx, 'label', e.target.value)}
+                                        className="w-full px-3 py-1 rounded-lg border border-slate-200 text-xs bg-white"
+                                      />
+                                    </div>
+                                    <div className="space-y-1">
+                                      <label className="text-[10px] text-slate-500 font-semibold">Label (English)</label>
+                                      <input
+                                        type="text"
+                                        value={stat.label_en || ''}
+                                        onChange={(e) => updateProjectStat(idx, sIdx, 'label_en', e.target.value)}
+                                        className="w-full px-3 py-1 rounded-lg border border-slate-200 text-xs bg-white"
+                                      />
+                                    </div>
+                                  </div>
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <div className="space-y-1">
+                                      <label className="text-[10px] text-slate-500 font-semibold">數值 (繁中)</label>
+                                      <input
+                                        type="text"
+                                        value={stat.value}
+                                        onChange={(e) => updateProjectStat(idx, sIdx, 'value', e.target.value)}
+                                        className="w-full px-3 py-1 rounded-lg border border-slate-200 text-xs bg-white"
+                                      />
+                                    </div>
+                                    <div className="space-y-1">
+                                      <label className="text-[10px] text-slate-500 font-semibold">Value (English)</label>
+                                      <input
+                                        type="text"
+                                        value={(stat as any).value_en || ''}
+                                        onChange={(e) => updateProjectStat(idx, sIdx, 'value_en', e.target.value)}
+                                        className="w-full px-3 py-1 rounded-lg border border-slate-200 text-xs bg-white"
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
                           </div>
                         </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex justify-end pt-2">
+                    <button
+                      type="submit"
+                      className="px-6 py-3 rounded-xl bg-blue-600 text-white font-bold text-xs tracking-wider transition-all hover:bg-blue-700 shadow-md"
+                    >
+                      發布專案與數據修改
+                    </button>
+                  </div>
+                </form>
+              )}
 
-                        {/* Statistics Grid */}
-                        <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-4">
-                          <h4 className="text-xs font-bold text-slate-700">指標數據修改 (Bilingual Stats)</h4>
-                          
-                          {project.stats && project.stats.map((stat, sIdx) => (
-                            <div key={sIdx} className="p-3 bg-slate-50 border border-slate-100 rounded-xl space-y-2.5">
-                              <span className="text-[9px] font-bold text-slate-400 block uppercase">指標數據 {sIdx + 1}</span>
-                              <div className="grid grid-cols-2 gap-2">
-                                <div className="space-y-1">
-                                  <label className="text-[10px] text-slate-500 font-semibold">標籤 (繁中)</label>
-                                  <input
-                                    type="text"
-                                    value={stat.label}
-                                    onChange={(e) => updateProjectStat(idx, sIdx, 'label', e.target.value)}
-                                    className="w-full px-3 py-1 rounded-lg border border-slate-200 text-xs bg-white"
-                                  />
-                                </div>
-                                <div className="space-y-1">
-                                  <label className="text-[10px] text-slate-500 font-semibold">Label (English)</label>
-                                  <input
-                                    type="text"
-                                    value={stat.label_en || ''}
-                                    onChange={(e) => updateProjectStat(idx, sIdx, 'label_en', e.target.value)}
-                                    className="w-full px-3 py-1 rounded-lg border border-slate-200 text-xs bg-white"
-                                  />
-                                </div>
+              {/* Sub-tab 2: Future Academy Page */}
+              {projectsSubTab === 'future_academy' && (
+                <form onSubmit={handleSaveFutureAcademy} className="space-y-6">
+                  <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
+                    <div className="border-b border-slate-100 pb-3">
+                      <h3 className="text-sm font-extrabold text-slate-800">未來學院 (Future Academy) 專頁內容設定</h3>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-slate-600">網頁大標題 (繁中) *</label>
+                        <input
+                          type="text"
+                          value={futureAcademyPage.heroTitle}
+                          onChange={(e) => updateFutureAcademyField('heroTitle', e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-slate-600">Hero Title (English) *</label>
+                        <input
+                          type="text"
+                          value={futureAcademyPage.heroTitle_en}
+                          onChange={(e) => updateFutureAcademyField('heroTitle_en', e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-slate-600">前言簡介 (繁中) *</label>
+                        <textarea
+                          value={futureAcademyPage.heroDesc}
+                          onChange={(e) => updateFutureAcademyField('heroDesc', e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs h-20 resize-none"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-slate-600">Hero Description (English) *</label>
+                        <textarea
+                          value={futureAcademyPage.heroDesc_en}
+                          onChange={(e) => updateFutureAcademyField('heroDesc_en', e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs h-20 resize-none"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-4 p-4 bg-slate-50 rounded-xl">
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-slate-600">累計培訓數據文字</label>
+                        <input
+                          type="text"
+                          value={futureAcademyPage.trainedCount}
+                          onChange={(e) => updateFutureAcademyField('trainedCount', e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-slate-600">培訓標籤 (繁中)</label>
+                        <input
+                          type="text"
+                          value={futureAcademyPage.trainedLabel}
+                          onChange={(e) => updateFutureAcademyField('trainedLabel', e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-slate-600">Trained Label (English)</label>
+                        <input
+                          type="text"
+                          value={futureAcademyPage.trainedLabel_en}
+                          onChange={(e) => updateFutureAcademyField('trainedLabel_en', e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Courses Editor */}
+                    <div className="space-y-4 pt-4 border-t border-slate-100">
+                      <div className="flex justify-between items-center">
+                        <h4 className="text-xs font-bold text-slate-700">培育課程方案設定 (Courses)</h4>
+                        <button
+                          type="button"
+                          onClick={handleFutureAcademyAddCourse}
+                          className="px-2 py-1 bg-blue-50 text-blue-600 hover:bg-blue-100 text-[10px] font-bold rounded"
+                        >
+                          + 新增課程
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-4">
+                        {futureAcademyPage.courses.map((course, cIdx) => (
+                          <div key={cIdx} className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3 relative">
+                            <button
+                              type="button"
+                              onClick={() => handleFutureAcademyDeleteCourse(cIdx)}
+                              className="absolute top-3 right-3 text-red-500 hover:text-red-700 text-xs font-bold"
+                            >
+                              刪除
+                            </button>
+
+                            <div className="grid grid-cols-4 gap-4">
+                              <div className="space-y-1">
+                                <label className="text-[10px] text-slate-500 font-semibold">代表 Emoji 圖示</label>
+                                <input
+                                  type="text"
+                                  value={course.icon}
+                                  onChange={(e) => updateFutureAcademyCourse(cIdx, 'icon', e.target.value)}
+                                  className="w-full px-2 py-1 rounded border border-slate-200 text-xs bg-white"
+                                />
                               </div>
-                              <div className="grid grid-cols-2 gap-2">
+                              <div className="space-y-1">
+                                <label className="text-[10px] text-slate-500 font-semibold">課程名稱 (繁中)</label>
+                                <input
+                                  type="text"
+                                  value={course.title}
+                                  onChange={(e) => updateFutureAcademyCourse(cIdx, 'title', e.target.value)}
+                                  className="w-full px-2 py-1 rounded border border-slate-200 text-xs bg-white"
+                                />
+                              </div>
+                              <div className="space-y-1 col-span-2">
+                                <label className="text-[10px] text-slate-500 font-semibold">Course Title (English)</label>
+                                <input
+                                  type="text"
+                                  value={course.title_en}
+                                  onChange={(e) => updateFutureAcademyCourse(cIdx, 'title_en', e.target.value)}
+                                  className="w-full px-2 py-1 rounded border border-slate-200 text-xs bg-white"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-1">
+                                <label className="text-[10px] text-slate-500 font-semibold">簡介描述 (繁中)</label>
+                                <textarea
+                                  value={course.desc}
+                                  onChange={(e) => updateFutureAcademyCourse(cIdx, 'desc', e.target.value)}
+                                  className="w-full px-2 py-1 rounded border border-slate-200 text-xs h-16 bg-white resize-none"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <label className="text-[10px] text-slate-500 font-semibold">Description (English)</label>
+                                <textarea
+                                  value={course.desc_en}
+                                  onChange={(e) => updateFutureAcademyCourse(cIdx, 'desc_en', e.target.value)}
+                                  className="w-full px-2 py-1 rounded border border-slate-200 text-xs h-16 bg-white resize-none"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Gallery Editor */}
+                    <div className="space-y-4 pt-4 border-t border-slate-100">
+                      <div className="flex justify-between items-center">
+                        <h4 className="text-xs font-bold text-slate-700">活動剪影與相簿設定 (Gallery)</h4>
+                        <button
+                          type="button"
+                          onClick={handleFutureAcademyAddGalleryItem}
+                          className="px-2 py-1 bg-blue-50 text-blue-600 hover:bg-blue-100 text-[10px] font-bold rounded"
+                        >
+                          + 新增相片
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-4">
+                        {futureAcademyPage.gallery && futureAcademyPage.gallery.map((gallery, gIdx) => (
+                          <div key={gIdx} className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3 relative">
+                            <button
+                              type="button"
+                              onClick={() => handleFutureAcademyDeleteGalleryItem(gIdx)}
+                              className="absolute top-3 right-3 text-red-500 hover:text-red-700 text-xs font-bold"
+                            >
+                              刪除
+                            </button>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div className="space-y-3">
                                 <div className="space-y-1">
-                                  <label className="text-[10px] text-slate-500 font-semibold">數值 (繁中)</label>
+                                  <label className="text-[10px] text-slate-500 font-semibold">照片網址 (url)</label>
                                   <input
                                     type="text"
-                                    value={stat.value}
-                                    onChange={(e) => updateProjectStat(idx, sIdx, 'value', e.target.value)}
-                                    className="w-full px-3 py-1 rounded-lg border border-slate-200 text-xs bg-white"
+                                    value={gallery.url}
+                                    onChange={(e) => updateFutureAcademyGalleryItem(gIdx, 'url', e.target.value)}
+                                    className="w-full px-2 py-1.5 rounded border border-slate-200 text-xs bg-white"
                                   />
                                 </div>
-                                <div className="space-y-1">
-                                  <label className="text-[10px] text-slate-500 font-semibold">Value (English)</label>
+                                <label className="border border-dashed border-slate-300 rounded-lg p-2.5 text-center bg-white hover:bg-slate-50 flex flex-col items-center justify-center cursor-pointer space-y-0.5">
+                                  <Upload className="w-4 h-4 text-slate-400" />
+                                  <span className="text-[9px] font-bold text-slate-500">
+                                    {uploadingField === `fa-gallery-${gIdx}` ? '上傳中...' : '為此項目上傳圖片至 Cloudinary'}
+                                  </span>
                                   <input
-                                    type="text"
-                                    value={(stat as any).value_en || ''}
-                                    onChange={(e) => updateProjectStat(idx, sIdx, 'value_en', e.target.value)}
-                                    className="w-full px-3 py-1 rounded-lg border border-slate-200 text-xs bg-white"
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={(e) => handleCloudinaryFieldUpload(e, 'fa-gallery', gIdx)}
+                                    disabled={uploadingField !== null}
                                   />
+                                </label>
+                              </div>
+
+                              <div className="space-y-3">
+                                <div className="grid grid-cols-2 gap-2">
+                                  <div className="space-y-1">
+                                    <label className="text-[10px] text-slate-500 font-semibold">相片標題 (繁中)</label>
+                                    <input
+                                      type="text"
+                                      value={gallery.title}
+                                      onChange={(e) => updateFutureAcademyGalleryItem(gIdx, 'title', e.target.value)}
+                                      className="w-full px-2 py-1 rounded border border-slate-200 text-xs bg-white"
+                                    />
+                                  </div>
+                                  <div className="space-y-1">
+                                    <label className="text-[10px] text-slate-500 font-semibold">Title (English)</label>
+                                    <input
+                                      type="text"
+                                      value={gallery.title_en}
+                                      onChange={(e) => updateFutureAcademyGalleryItem(gIdx, 'title_en', e.target.value)}
+                                      className="w-full px-2 py-1 rounded border border-slate-200 text-xs bg-white"
+                                    />
+                                  </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-2">
+                                  <div className="space-y-1">
+                                    <label className="text-[10px] text-slate-500 font-semibold">剪影說明 (繁中)</label>
+                                    <input
+                                      type="text"
+                                      value={gallery.desc}
+                                      onChange={(e) => updateFutureAcademyGalleryItem(gIdx, 'desc', e.target.value)}
+                                      className="w-full px-2 py-1 rounded border border-slate-200 text-xs bg-white"
+                                    />
+                                  </div>
+                                  <div className="space-y-1">
+                                    <label className="text-[10px] text-slate-500 font-semibold">Description (English)</label>
+                                    <input
+                                      type="text"
+                                      value={gallery.desc_en}
+                                      onChange={(e) => updateFutureAcademyGalleryItem(gIdx, 'desc_en', e.target.value)}
+                                      className="w-full px-2 py-1 rounded border border-slate-200 text-xs bg-white"
+                                    />
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          ))}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                  </div>
+                  <div className="flex justify-end pt-2">
+                    <button
+                      type="submit"
+                      className="px-6 py-3 rounded-xl bg-blue-600 text-white font-bold text-xs tracking-wider transition-all hover:bg-blue-700 shadow-md"
+                    >
+                      發布未來學院設定
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* Sub-tab 3: Golden Constant Page */}
+              {projectsSubTab === 'golden_constant' && (
+                <form onSubmit={handleSaveGoldenConstant} className="space-y-6">
+                  <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
+                    <div className="border-b border-slate-100 pb-3">
+                      <h3 className="text-sm font-extrabold text-slate-800">金恆獎 (Golden Constant) 專頁內容設定</h3>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-slate-600">簡介大標題 (繁中) *</label>
+                        <input
+                          type="text"
+                          value={goldenConstantPage.introTitle}
+                          onChange={(e) => updateGoldenConstantField('introTitle', e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-slate-600">Intro Title (English) *</label>
+                        <input
+                          type="text"
+                          value={goldenConstantPage.introTitle_en}
+                          onChange={(e) => updateGoldenConstantField('introTitle_en', e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-slate-600">詳細說明 (繁中) *</label>
+                        <textarea
+                          value={goldenConstantPage.introDesc}
+                          onChange={(e) => updateGoldenConstantField('introDesc', e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs h-20 resize-none"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-slate-600">Intro Description (English) *</label>
+                        <textarea
+                          value={goldenConstantPage.introDesc_en}
+                          onChange={(e) => updateGoldenConstantField('introDesc_en', e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs h-20 resize-none"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-slate-600">金恆獎宗旨 (繁中)</label>
+                        <textarea
+                          value={goldenConstantPage.purposeDesc}
+                          onChange={(e) => updateGoldenConstantField('purposeDesc', e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs h-16 resize-none"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-slate-600">Mission Description (English)</label>
+                        <textarea
+                          value={goldenConstantPage.purposeDesc_en}
+                          onChange={(e) => updateGoldenConstantField('purposeDesc_en', e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs h-16 resize-none"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Events Editor */}
+                    <div className="space-y-4 pt-4 border-t border-slate-100">
+                      <div className="flex justify-between items-center">
+                        <h4 className="text-xs font-bold text-slate-700">各年度得獎與活動紀錄列表 (Events)</h4>
+                        <button
+                          type="button"
+                          onClick={handleGoldenConstantAddEvent}
+                          className="px-2 py-1 bg-blue-50 text-blue-600 hover:bg-blue-100 text-[10px] font-bold rounded"
+                        >
+                          + 新增活動紀錄
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-4">
+                        {goldenConstantPage.events.map((event, eIdx) => (
+                          <div key={eIdx} className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3 relative">
+                            <button
+                              type="button"
+                              onClick={() => handleGoldenConstantDeleteEvent(eIdx)}
+                              className="absolute top-3 right-3 text-red-500 hover:text-red-700 text-xs font-bold"
+                            >
+                              刪除
+                            </button>
+
+                            <div className="grid grid-cols-4 gap-4">
+                              <div className="space-y-1">
+                                <label className="text-[10px] text-slate-500 font-semibold">紀錄年份 (如 2026)</label>
+                                <input
+                                  type="number"
+                                  value={event.year}
+                                  onChange={(e) => updateGoldenConstantEvent(eIdx, 'year', parseInt(e.target.value) || 2026)}
+                                  className="w-full px-2 py-1 rounded border border-slate-200 text-xs bg-white"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <label className="text-[10px] text-slate-500 font-semibold">分類標籤 (繁中)</label>
+                                <input
+                                  type="text"
+                                  value={event.category}
+                                  onChange={(e) => updateGoldenConstantEvent(eIdx, 'category', e.target.value)}
+                                  className="w-full px-2 py-1 rounded border border-slate-200 text-xs bg-white"
+                                />
+                              </div>
+                              <div className="space-y-1 col-span-2">
+                                <label className="text-[10px] text-slate-500 font-semibold">Category (English)</label>
+                                <input
+                                  type="text"
+                                  value={event.category_en}
+                                  onChange={(e) => updateGoldenConstantEvent(eIdx, 'category_en', e.target.value)}
+                                  className="w-full px-2 py-1 rounded border border-slate-200 text-xs bg-white"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-1">
+                                <label className="text-[10px] text-slate-500 font-semibold">活動標題 (繁中)</label>
+                                <input
+                                  type="text"
+                                  value={event.title}
+                                  onChange={(e) => updateGoldenConstantEvent(eIdx, 'title', e.target.value)}
+                                  className="w-full px-2 py-1 rounded border border-slate-200 text-xs bg-white"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <label className="text-[10px] text-slate-500 font-semibold">Title (English)</label>
+                                <input
+                                  type="text"
+                                  value={event.title_en}
+                                  onChange={(e) => updateGoldenConstantEvent(eIdx, 'title_en', e.target.value)}
+                                  className="w-full px-2 py-1 rounded border border-slate-200 text-xs bg-white"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-1">
+                                <label className="text-[10px] text-slate-500 font-semibold">摘要簡介 (繁中)</label>
+                                <textarea
+                                  value={event.summary}
+                                  onChange={(e) => updateGoldenConstantEvent(eIdx, 'summary', e.target.value)}
+                                  className="w-full px-2 py-1 rounded border border-slate-200 text-xs h-16 bg-white resize-none"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <label className="text-[10px] text-slate-500 font-semibold">Summary (English)</label>
+                                <textarea
+                                  value={event.summary_en}
+                                  onChange={(e) => updateGoldenConstantEvent(eIdx, 'summary_en', e.target.value)}
+                                  className="w-full px-2 py-1 rounded border border-slate-200 text-xs h-16 bg-white resize-none"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-2">
+                                <div className="space-y-1">
+                                  <label className="text-[10px] text-slate-500 font-semibold">活動大圖網址 (img)</label>
+                                  <input
+                                    type="text"
+                                    value={event.img}
+                                    onChange={(e) => updateGoldenConstantEvent(eIdx, 'img', e.target.value)}
+                                    className="w-full px-2 py-1 rounded border border-slate-200 text-xs bg-white"
+                                  />
+                                </div>
+                                <label className="border border-dashed border-slate-300 rounded-lg p-2.5 text-center bg-white hover:bg-slate-50 flex flex-col items-center justify-center cursor-pointer space-y-0.5">
+                                  <Upload className="w-4 h-4 text-slate-400" />
+                                  <span className="text-[9px] font-bold text-slate-500">
+                                    {uploadingField === `gc-event-${eIdx}` ? '上傳中...' : '為此紀錄上傳大圖至 Cloudinary'}
+                                  </span>
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={(e) => handleCloudinaryFieldUpload(e, 'gc-event', eIdx)}
+                                    disabled={uploadingField !== null}
+                                  />
+                                </label>
+                              </div>
+                              {event.img && (
+                                <div className="h-28 rounded-lg overflow-hidden border border-slate-200 bg-slate-900">
+                                  <img src={event.img} alt="Preview" className="w-full h-full object-cover opacity-75" />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                  </div>
+                  <div className="flex justify-end pt-2">
+                    <button
+                      type="submit"
+                      className="px-6 py-3 rounded-xl bg-blue-600 text-white font-bold text-xs tracking-wider transition-all hover:bg-blue-700 shadow-md"
+                    >
+                      發布金恆獎設定
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* Sub-tab 4: Goodness Literacy Page */}
+              {projectsSubTab === 'goodness_literacy' && (
+                <form onSubmit={handleSaveGoodnessLiteracy} className="space-y-6">
+                  <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
+                    <div className="border-b border-slate-100 pb-3">
+                      <h3 className="text-sm font-extrabold text-slate-800">良善素養教育 (Goodness Literacy) 專頁內容設定</h3>
+                    </div>
+
+                    {/* Section 1: Plan Tab */}
+                    <div className="p-4 rounded-xl border border-slate-200/60 bg-slate-50 space-y-4">
+                      <h4 className="text-xs font-bold text-slate-700">1. 良善素養教育計畫 (Plan Tab)</h4>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-slate-600">單元標題 (繁中)</label>
+                          <input
+                            type="text"
+                            value={goodnessLiteracyPage.planTitle}
+                            onChange={(e) => updateGoodnessLiteracyField('planTitle', e.target.value)}
+                            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-slate-600">Title (English)</label>
+                          <input
+                            type="text"
+                            value={goodnessLiteracyPage.planTitle_en}
+                            onChange={(e) => updateGoodnessLiteracyField('planTitle_en', e.target.value)}
+                            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-slate-600">第一段簡介 (繁中)</label>
+                          <textarea
+                            value={goodnessLiteracyPage.planDesc}
+                            onChange={(e) => updateGoodnessLiteracyField('planDesc', e.target.value)}
+                            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs h-16 bg-white resize-none"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-slate-600">First Paragraph (English)</label>
+                          <textarea
+                            value={goodnessLiteracyPage.planDesc_en}
+                            onChange={(e) => updateGoodnessLiteracyField('planDesc_en', e.target.value)}
+                            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs h-16 bg-white resize-none"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-slate-600">第二段簡介 (繁中)</label>
+                          <textarea
+                            value={goodnessLiteracyPage.planDescExtra}
+                            onChange={(e) => updateGoodnessLiteracyField('planDescExtra', e.target.value)}
+                            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs h-16 bg-white resize-none"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-slate-600">Second Paragraph (English)</label>
+                          <textarea
+                            value={goodnessLiteracyPage.planDescExtra_en}
+                            onChange={(e) => updateGoodnessLiteracyField('planDescExtra_en', e.target.value)}
+                            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs h-16 bg-white resize-none"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-slate-600">計畫指標 (繁中)</label>
+                          <input
+                            type="text"
+                            value={goodnessLiteracyPage.planTarget}
+                            onChange={(e) => updateGoodnessLiteracyField('planTarget', e.target.value)}
+                            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-slate-600">Target (English)</label>
+                          <input
+                            type="text"
+                            value={goodnessLiteracyPage.planTarget_en}
+                            onChange={(e) => updateGoodnessLiteracyField('planTarget_en', e.target.value)}
+                            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-slate-600">合作校園數據 (繁中)</label>
+                          <input
+                            type="text"
+                            value={goodnessLiteracyPage.planSchoolCount}
+                            onChange={(e) => updateGoodnessLiteracyField('planSchoolCount', e.target.value)}
+                            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-slate-600">Schools Count (English)</label>
+                          <input
+                            type="text"
+                            value={goodnessLiteracyPage.planSchoolCount_en}
+                            onChange={(e) => updateGoodnessLiteracyField('planSchoolCount_en', e.target.value)}
+                            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white"
+                          />
                         </div>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </div>
 
-              <div className="flex justify-end pt-4">
-                <button
-                  type="submit"
-                  className="px-6 py-3 rounded-xl bg-blue-600 text-white font-bold text-xs tracking-wider transition-all hover:bg-blue-700 shadow-md"
-                >
-                  發布專案與數據修改
-                </button>
-              </div>
-            </form>
+                    {/* Section 2: Citizen Tab */}
+                    <div className="p-4 rounded-xl border border-slate-200/60 bg-slate-50 space-y-4">
+                      <h4 className="text-xs font-bold text-slate-700">2. 世界公民專案計畫 (Citizen Tab)</h4>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-slate-600">單元標題 (繁中)</label>
+                          <input
+                            type="text"
+                            value={goodnessLiteracyPage.citizenTitle}
+                            onChange={(e) => updateGoodnessLiteracyField('citizenTitle', e.target.value)}
+                            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-slate-600">Title (English)</label>
+                          <input
+                            type="text"
+                            value={goodnessLiteracyPage.citizenTitle_en}
+                            onChange={(e) => updateGoodnessLiteracyField('citizenTitle_en', e.target.value)}
+                            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-slate-600">第一段說明 (繁中)</label>
+                          <textarea
+                            value={goodnessLiteracyPage.citizenDesc}
+                            onChange={(e) => updateGoodnessLiteracyField('citizenDesc', e.target.value)}
+                            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs h-16 bg-white resize-none"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-slate-600">First Paragraph (English)</label>
+                          <textarea
+                            value={goodnessLiteracyPage.citizenDesc_en}
+                            onChange={(e) => updateGoodnessLiteracyField('citizenDesc_en', e.target.value)}
+                            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs h-16 bg-white resize-none"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-slate-600">第二段說明 (繁中)</label>
+                          <textarea
+                            value={goodnessLiteracyPage.citizenDescExtra}
+                            onChange={(e) => updateGoodnessLiteracyField('citizenDescExtra', e.target.value)}
+                            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs h-16 bg-white resize-none"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-slate-600">Second Paragraph (English)</label>
+                          <textarea
+                            value={goodnessLiteracyPage.citizenDescExtra_en}
+                            onChange={(e) => updateGoodnessLiteracyField('citizenDescExtra_en', e.target.value)}
+                            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs h-16 bg-white resize-none"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-slate-600">專案指標 (繁中)</label>
+                          <input
+                            type="text"
+                            value={goodnessLiteracyPage.citizenTarget}
+                            onChange={(e) => updateGoodnessLiteracyField('citizenTarget', e.target.value)}
+                            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-slate-600">Target (English)</label>
+                          <input
+                            type="text"
+                            value={goodnessLiteracyPage.citizenTarget_en}
+                            onChange={(e) => updateGoodnessLiteracyField('citizenTarget_en', e.target.value)}
+                            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-slate-600">累積行動數據 (繁中)</label>
+                          <input
+                            type="text"
+                            value={goodnessLiteracyPage.citizenCount}
+                            onChange={(e) => updateGoodnessLiteracyField('citizenCount', e.target.value)}
+                            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-slate-600">Actions Count (English)</label>
+                          <input
+                            type="text"
+                            value={goodnessLiteracyPage.citizenCount_en}
+                            onChange={(e) => updateGoodnessLiteracyField('citizenCount_en', e.target.value)}
+                            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Section 3: Tools Editor */}
+                    <div className="space-y-4 pt-4 border-t border-slate-100">
+                      <div className="flex justify-between items-center">
+                        <h4 className="text-xs font-bold text-slate-700">3. 善行教材與工具設定 (Tools)</h4>
+                        <button
+                          type="button"
+                          onClick={handleGoodnessLiteracyAddTool}
+                          className="px-2 py-1 bg-blue-50 text-blue-600 hover:bg-blue-100 text-[10px] font-bold rounded"
+                        >
+                          + 新增教材工具
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-4">
+                        {goodnessLiteracyPage.tools.map((tool, tIdx) => (
+                          <div key={tIdx} className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3 relative">
+                            <button
+                              type="button"
+                              onClick={() => handleGoodnessLiteracyDeleteTool(tIdx)}
+                              className="absolute top-3 right-3 text-red-500 hover:text-red-700 text-xs font-bold"
+                            >
+                              刪除
+                            </button>
+
+                            <div className="grid grid-cols-4 gap-4">
+                              <div className="space-y-1">
+                                <label className="text-[10px] text-slate-500 font-semibold">代表 Emoji 圖示</label>
+                                <input
+                                  type="text"
+                                  value={tool.emoji}
+                                  onChange={(e) => updateGoodnessLiteracyTool(tIdx, 'emoji', e.target.value)}
+                                  className="w-full px-2 py-1 rounded border border-slate-200 text-xs bg-white"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <label className="text-[10px] text-slate-500 font-semibold">教材工具名稱 (繁中)</label>
+                                <input
+                                  type="text"
+                                  value={tool.title}
+                                  onChange={(e) => updateGoodnessLiteracyTool(tIdx, 'title', e.target.value)}
+                                  className="w-full px-2 py-1 rounded border border-slate-200 text-xs bg-white"
+                                />
+                              </div>
+                              <div className="space-y-1 col-span-2">
+                                <label className="text-[10px] text-slate-500 font-semibold">Tool Title (English)</label>
+                                <input
+                                  type="text"
+                                  value={tool.title_en}
+                                  onChange={(e) => updateGoodnessLiteracyTool(tIdx, 'title_en', e.target.value)}
+                                  className="w-full px-2 py-1 rounded border border-slate-200 text-xs bg-white"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-1">
+                                <label className="text-[10px] text-slate-500 font-semibold">工具簡介說明 (繁中)</label>
+                                <textarea
+                                  value={tool.desc}
+                                  onChange={(e) => updateGoodnessLiteracyTool(tIdx, 'desc', e.target.value)}
+                                  className="w-full px-2 py-1 rounded border border-slate-200 text-xs h-16 bg-white resize-none"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <label className="text-[10px] text-slate-500 font-semibold">Description (English)</label>
+                                <textarea
+                                  value={tool.desc_en}
+                                  onChange={(e) => updateGoodnessLiteracyTool(tIdx, 'desc_en', e.target.value)}
+                                  className="w-full px-2 py-1 rounded border border-slate-200 text-xs h-16 bg-white resize-none"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                  </div>
+                  <div className="flex justify-end pt-2">
+                    <button
+                      type="submit"
+                      className="px-6 py-3 rounded-xl bg-blue-600 text-white font-bold text-xs tracking-wider transition-all hover:bg-blue-700 shadow-md"
+                    >
+                      發布良善素養教育設定
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* Sub-tab 5: Annual Concert Page */}
+              {projectsSubTab === 'annual_concert' && (
+                <form onSubmit={handleSaveAnnualConcert} className="space-y-6">
+                  <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
+                    <div className="border-b border-slate-100 pb-3">
+                      <h3 className="text-sm font-extrabold text-slate-800">世界公民年度音樂會 (Annual Concert) 專頁內容設定</h3>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-slate-600">簡介標題 (繁中) *</label>
+                        <input
+                          type="text"
+                          value={annualConcertPage.introTitle}
+                          onChange={(e) => updateAnnualConcertField('introTitle', e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-slate-600">Intro Title (English) *</label>
+                        <input
+                          type="text"
+                          value={annualConcertPage.introTitle_en}
+                          onChange={(e) => updateAnnualConcertField('introTitle_en', e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-slate-600">詳細說明 (繁中) *</label>
+                        <textarea
+                          value={annualConcertPage.introDesc}
+                          onChange={(e) => updateAnnualConcertField('introDesc', e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs h-20 resize-none"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-slate-600">Intro Description (English) *</label>
+                        <textarea
+                          value={annualConcertPage.introDesc_en}
+                          onChange={(e) => updateAnnualConcertField('introDesc_en', e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs h-20 resize-none"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-slate-600">慈善盈餘投向描述 (繁中)</label>
+                        <textarea
+                          value={annualConcertPage.surplusDesc}
+                          onChange={(e) => updateAnnualConcertField('surplusDesc', e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs h-16 resize-none"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-slate-600">Destination Description (English)</label>
+                        <textarea
+                          value={annualConcertPage.surplusDesc_en}
+                          onChange={(e) => updateAnnualConcertField('surplusDesc_en', e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs h-16 resize-none"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Concerts Editor */}
+                    <div className="space-y-4 pt-4 border-t border-slate-100">
+                      <div className="flex justify-between items-center">
+                        <h4 className="text-xs font-bold text-slate-700">歷年慈善音樂會回顧列表 (Concerts)</h4>
+                        <button
+                          type="button"
+                          onClick={handleAnnualConcertAddEvent}
+                          className="px-2 py-1 bg-blue-50 text-blue-600 hover:bg-blue-100 text-[10px] font-bold rounded"
+                        >
+                          + 新增音樂會回顧
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-4">
+                        {annualConcertPage.concerts.map((concert, cIdx) => (
+                          <div key={cIdx} className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3 relative">
+                            <button
+                              type="button"
+                              onClick={() => handleAnnualConcertDeleteEvent(cIdx)}
+                              className="absolute top-3 right-3 text-red-500 hover:text-red-700 text-xs font-bold"
+                            >
+                              刪除
+                            </button>
+
+                            <div className="grid grid-cols-4 gap-4">
+                              <div className="space-y-1">
+                                <label className="text-[10px] text-slate-500 font-semibold">舉辦年份 (如 2026)</label>
+                                <input
+                                  type="number"
+                                  value={concert.year}
+                                  onChange={(e) => updateAnnualConcertEvent(cIdx, 'year', parseInt(e.target.value) || 2026)}
+                                  className="w-full px-2 py-1 rounded border border-slate-200 text-xs bg-white"
+                                />
+                              </div>
+                              <div className="space-y-1 col-span-3">
+                                <label className="text-[10px] text-slate-500 font-semibold">音樂會標題 (繁中)</label>
+                                <input
+                                  type="text"
+                                  value={concert.title}
+                                  onChange={(e) => updateAnnualConcertEvent(cIdx, 'title', e.target.value)}
+                                  className="w-full px-2 py-1 rounded border border-slate-200 text-xs bg-white"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-1">
+                                <label className="text-[10px] text-slate-500 font-semibold">Title (English)</label>
+                                <input
+                                  type="text"
+                                  value={concert.title_en}
+                                  onChange={(e) => updateAnnualConcertEvent(cIdx, 'title_en', e.target.value)}
+                                  className="w-full px-2 py-1 rounded border border-slate-200 text-xs bg-white"
+                                />
+                              </div>
+                              <div className="grid grid-cols-2 gap-2">
+                                <div className="space-y-1">
+                                  <label className="text-[10px] text-slate-500 font-semibold">義演主題 (繁中)</label>
+                                  <input
+                                    type="text"
+                                    value={concert.theme}
+                                    onChange={(e) => updateAnnualConcertEvent(cIdx, 'theme', e.target.value)}
+                                    className="w-full px-2 py-1 rounded border border-slate-200 text-xs bg-white"
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <label className="text-[10px] text-slate-500 font-semibold">Theme (English)</label>
+                                  <input
+                                    type="text"
+                                    value={concert.theme_en}
+                                    onChange={(e) => updateAnnualConcertEvent(cIdx, 'theme_en', e.target.value)}
+                                    className="w-full px-2 py-1 rounded border border-slate-200 text-xs bg-white"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="grid grid-cols-2 gap-2">
+                                <div className="space-y-1">
+                                  <label className="text-[10px] text-slate-500 font-semibold">演奏地點 (繁中)</label>
+                                  <input
+                                    type="text"
+                                    value={concert.location}
+                                    onChange={(e) => updateAnnualConcertEvent(cIdx, 'location', e.target.value)}
+                                    className="w-full px-2 py-1 rounded border border-slate-200 text-xs bg-white"
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <label className="text-[10px] text-slate-500 font-semibold">Location (English)</label>
+                                  <input
+                                    type="text"
+                                    value={concert.location_en}
+                                    onChange={(e) => updateAnnualConcertEvent(cIdx, 'location_en', e.target.value)}
+                                    className="w-full px-2 py-1 rounded border border-slate-200 text-xs bg-white"
+                                  />
+                                </div>
+                              </div>
+                              <div className="space-y-2">
+                                <div className="space-y-1">
+                                  <label className="text-[10px] text-slate-500 font-semibold">演出照片網址 (img)</label>
+                                  <input
+                                    type="text"
+                                    value={concert.img}
+                                    onChange={(e) => updateAnnualConcertEvent(cIdx, 'img', e.target.value)}
+                                    className="w-full px-2 py-1 rounded border border-slate-200 text-xs bg-white"
+                                  />
+                                </div>
+                                <label className="border border-dashed border-slate-300 rounded-lg p-2.5 text-center bg-white hover:bg-slate-50 flex flex-col items-center justify-center cursor-pointer space-y-0.5">
+                                  <Upload className="w-4 h-4 text-slate-400" />
+                                  <span className="text-[9px] font-bold text-slate-500">
+                                    {uploadingField === `ac-concert-${cIdx}` ? '上傳中...' : '為此回顧上傳照片至 Cloudinary'}
+                                  </span>
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={(e) => handleCloudinaryFieldUpload(e, 'ac-concert', cIdx)}
+                                    disabled={uploadingField !== null}
+                                  />
+                                </label>
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-1">
+                                <label className="text-[10px] text-slate-500 font-semibold">音樂會簡介與回顧描述 (繁中)</label>
+                                <textarea
+                                  value={concert.desc}
+                                  onChange={(e) => updateAnnualConcertEvent(cIdx, 'desc', e.target.value)}
+                                  className="w-full px-2 py-1 rounded border border-slate-200 text-xs h-16 bg-white resize-none"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <label className="text-[10px] text-slate-500 font-semibold">Description (English)</label>
+                                <textarea
+                                  value={concert.desc_en}
+                                  onChange={(e) => updateAnnualConcertEvent(cIdx, 'desc_en', e.target.value)}
+                                  className="w-full px-2 py-1 rounded border border-slate-200 text-xs h-16 bg-white resize-none"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                  </div>
+                  <div className="flex justify-end pt-2">
+                    <button
+                      type="submit"
+                      className="px-6 py-3 rounded-xl bg-blue-600 text-white font-bold text-xs tracking-wider transition-all hover:bg-blue-700 shadow-md"
+                    >
+                      發布年度音樂會設定
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
           )}
 
           {/* 5. LATEST NEWS CMS */}
