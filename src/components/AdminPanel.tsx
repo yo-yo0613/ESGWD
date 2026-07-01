@@ -555,6 +555,30 @@ export default function AdminPanel() {
     setHeroSlides(updated);
   };
 
+  const handleAddSlide = () => {
+    const newSlide: HeroSlideData = {
+      id: Date.now(),
+      title: '新輪播標題',
+      title_en: 'New Slide Title',
+      subtitle: '新輪播副標題簡介',
+      subtitle_en: 'New slide description',
+      buttonText: '了解詳情',
+      buttonText_en: 'Learn More',
+      themeColor: '#10B981',
+      bgGradient: 'from-emerald-600/30 via-slate-900/90 to-brand-navy-dark/95',
+      bgImage: '/images/forum_hero.jpg',
+      link: '/projects/future-academy'
+    };
+    setHeroSlides([...heroSlides, newSlide]);
+  };
+
+  const handleDeleteSlide = (index: number) => {
+    if (confirm('確定要刪除此輪播頁嗎？')) {
+      const updated = heroSlides.filter((_, i) => i !== index);
+      setHeroSlides(updated);
+    }
+  };
+
   const updateProjectField = (index: number, field: keyof ProjectData, value: any) => {
     const updated = [...projectsList];
     updated[index] = { ...updated[index], [field]: value } as ProjectData;
@@ -1464,32 +1488,61 @@ export default function AdminPanel() {
             <form onSubmit={handleSaveHero} className="space-y-8 animate-fade-in">
               <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
                 <div className="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
-                  <h3 className="text-sm font-extrabold text-slate-800">首頁大圖輪播設定 (Hero Slider)</h3>
-                  <span className="text-xs text-slate-400">目前固定配置 3 個廣告輪播頁</span>
+                  <div>
+                    <h3 className="text-sm font-extrabold text-slate-800">首頁大圖輪播設定 (Hero Slider)</h3>
+                    <span className="text-xs text-slate-400">支援動態新增、刪除、跳轉連結與英文版文字設定</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAddSlide}
+                    className="px-3.5 py-2 bg-blue-50 text-blue-600 hover:bg-blue-100 text-xs font-bold rounded-lg transition-colors flex items-center space-x-1"
+                  >
+                    <span>+ 新增輪播頁</span>
+                  </button>
                 </div>
 
                 <div className="space-y-8">
                   {heroSlides.map((slide, idx) => (
                     <div key={slide.id || idx} className="p-6 rounded-2xl bg-slate-50 border border-slate-200/60 space-y-4 relative">
-                      <div className="absolute top-4 left-4 bg-brand-navy text-brand-amber font-bold text-xs px-2.5 py-1 rounded-lg">
-                        輪播頁 {idx + 1}
+                      <div className="flex justify-between items-center pb-2 border-b border-slate-200/50">
+                        <div className="bg-brand-navy text-brand-amber font-bold text-xs px-2.5 py-1 rounded-lg">
+                          輪播頁 {idx + 1}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteSlide(idx)}
+                          className="text-red-500 hover:text-red-700 text-xs font-bold"
+                        >
+                          刪除此頁
+                        </button>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
                         <div className="space-y-4">
-                          <div className="space-y-1">
-                            <label className="text-xs font-bold text-slate-600">廣告標題 *</label>
-                            <input
-                              type="text"
-                              value={slide.title}
-                              onChange={(e) => updateSlideField(idx, 'title', e.target.value)}
-                              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
-                              required
-                            />
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                              <label className="text-xs font-bold text-slate-600">廣告標題 (繁中) *</label>
+                              <input
+                                type="text"
+                                value={slide.title}
+                                onChange={(e) => updateSlideField(idx, 'title', e.target.value)}
+                                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                                required
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="text-xs font-bold text-slate-600">Title (English)</label>
+                              <input
+                                type="text"
+                                value={slide.title_en || ''}
+                                onChange={(e) => updateSlideField(idx, 'title_en', e.target.value)}
+                                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                              />
+                            </div>
                           </div>
 
                           <div className="space-y-1">
-                            <label className="text-xs font-bold text-slate-600">副標題簡介</label>
+                            <label className="text-xs font-bold text-slate-600">副標題簡介 (繁中)</label>
                             <textarea
                               value={slide.subtitle}
                               onChange={(e) => updateSlideField(idx, 'subtitle', e.target.value)}
@@ -1497,13 +1550,44 @@ export default function AdminPanel() {
                             />
                           </div>
 
+                          <div className="space-y-1">
+                            <label className="text-xs font-bold text-slate-600">Subtitle (English)</label>
+                            <textarea
+                              value={slide.subtitle_en || ''}
+                              onChange={(e) => updateSlideField(idx, 'subtitle_en', e.target.value)}
+                              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs h-16 resize-none focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                            />
+                          </div>
+
                           <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1">
-                              <label className="text-xs font-bold text-slate-600">按鈕文字</label>
+                              <label className="text-xs font-bold text-slate-600">按鈕文字 (繁中)</label>
                               <input
                                 type="text"
                                 value={slide.buttonText}
                                 onChange={(e) => updateSlideField(idx, 'buttonText', e.target.value)}
+                                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="text-xs font-bold text-slate-600">Button (English)</label>
+                              <input
+                                type="text"
+                                value={slide.buttonText_en || ''}
+                                onChange={(e) => updateSlideField(idx, 'buttonText_en', e.target.value)}
+                                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                              <label className="text-xs font-bold text-slate-600">點擊跳轉連結 (Link)</label>
+                              <input
+                                type="text"
+                                value={slide.link || ''}
+                                onChange={(e) => updateSlideField(idx, 'link', e.target.value)}
+                                placeholder="例：/projects/future-academy 或 /#news"
                                 className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
                               />
                             </div>

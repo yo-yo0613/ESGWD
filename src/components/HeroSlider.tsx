@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { loadConfig } from '../utils/configLoader';
 import { initialHeroSlides } from '../data/siteInitialData';
 import type { HeroSlideData } from '../data/siteInitialData';
+import { useLanguage } from '../context/LanguageContext';
 
 interface HeroSliderProps {
   onCtaClick: (sectionId: string) => void;
@@ -15,6 +17,10 @@ export default function HeroSlider({ onCtaClick }: HeroSliderProps) {
   const [progress, setProgress] = useState(0);
   const timerRef = useRef<any>(null);
   const progressIntervalRef = useRef<any>(null);
+  
+  const navigate = useNavigate();
+  const { language } = useLanguage();
+  const bi = (zh: string, en?: string) => (language === 'en' && en) ? en : zh;
   
   // Dynamic Config Loading with Storage Event Sync
   useEffect(() => {
@@ -129,30 +135,41 @@ export default function HeroSlider({ onCtaClick }: HeroSliderProps) {
               className="px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest text-white border border-white/20 backdrop-blur-sm"
               style={{ backgroundColor: `${currentSlide.themeColor}30` }}
             >
-              世界公民活動焦點
+              {language === 'en' ? 'World Citizen Spotlight' : '世界公民活動焦點'}
             </span>
 
             {/* Title */}
             <h1 className="text-4xl md:text-6xl font-heading font-extrabold text-white leading-tight max-w-4xl tracking-wide drop-shadow-md">
-              {currentSlide.title}
+              {bi(currentSlide.title, currentSlide.title_en)}
             </h1>
 
             {/* Subtitle */}
             <p className="text-lg md:text-xl text-white/80 max-w-2xl leading-relaxed font-sans font-light">
-              {currentSlide.subtitle}
+              {bi(currentSlide.subtitle, currentSlide.subtitle_en)}
             </p>
 
             {/* Action Button */}
             <div className="pt-4">
               <button
-                onClick={() => onCtaClick('projects')}
+                onClick={() => {
+                  if (currentSlide.link) {
+                    if (currentSlide.link.startsWith('/#') || currentSlide.link.startsWith('#')) {
+                      const sectionId = currentSlide.link.replace('/#', '').replace('#', '');
+                      onCtaClick(sectionId);
+                    } else {
+                      navigate(currentSlide.link);
+                    }
+                  } else {
+                    onCtaClick('projects');
+                  }
+                }}
                 className="px-8 py-4 rounded-xl font-heading font-semibold text-white tracking-wide shadow-lg group flex items-center space-x-2 hover:scale-105 active:scale-95 transition-all duration-300"
                 style={{ 
                   backgroundColor: currentSlide.themeColor,
                   boxShadow: `0 10px 20px -5px ${currentSlide.themeColor}40`
                 }}
               >
-                <span>{currentSlide.buttonText}</span>
+                <span>{bi(currentSlide.buttonText, currentSlide.buttonText_en)}</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
               </button>
             </div>

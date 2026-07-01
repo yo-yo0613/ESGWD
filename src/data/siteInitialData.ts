@@ -1,11 +1,15 @@
 export interface HeroSlideData {
   id: number;
   title: string;
+  title_en?: string;
   subtitle: string;
+  subtitle_en?: string;
   buttonText: string;
+  buttonText_en?: string;
   themeColor: string;
   bgGradient: string;
   bgImage: string;
+  link?: string;
 }
 
 export interface ProjectData {
@@ -75,29 +79,41 @@ export const initialHeroSlides: HeroSlideData[] = [
   {
     id: 1,
     title: '2024百萬學童：愛向永續世界公民親子音樂會',
+    title_en: '2024 Million Children: Love Towards Sustainable World Citizen Concert',
     subtitle: '傳達每位世界公民應具備的美德 : 良善',
+    subtitle_en: 'Conveying the core virtue that every world citizen should possess: Goodness',
     buttonText: '了解活動詳情',
+    buttonText_en: 'Concert Details',
     themeColor: '#FF6B00',
     bgGradient: 'from-orange-600/30 via-slate-900/90 to-brand-navy-dark/95',
-    bgImage: '/images/concert_hero.jpg'
+    bgImage: '/images/concert_hero.jpg',
+    link: '/projects/concert'
   },
   {
     id: 2,
     title: 'AI 音樂跨界創作競賽',
+    title_en: 'AI Music Cross-border Creation Competition',
     subtitle: '激發學童與青年的科技創新，用 AI 譜寫關於生命與生態的永續樂章',
+    subtitle_en: 'Inspirational tech innovation for students, composing sustainable melodies about life and ecology with AI',
     buttonText: '立即報名參賽',
+    buttonText_en: 'Register Now',
     themeColor: '#8B5CF6',
     bgGradient: 'from-violet-600/30 via-slate-900/90 to-brand-navy-dark/95',
-    bgImage: '/images/ai_music_hero.jpg'
+    bgImage: '/images/ai_music_hero.jpg',
+    link: '/#news'
   },
   {
     id: 3,
     title: '未來學院：雙軸轉型領袖論壇',
+    title_en: 'Future Academy: Twin-Axis Transformation Leadership Forum',
     subtitle: '引領企業掌握綠色永續與數位雙軸轉型，榮獲金恆獎至高榮譽',
+    subtitle_en: 'Guiding enterprises to master green sustainability and digital twin transition',
     buttonText: '探索論壇精采內容',
+    buttonText_en: 'Explore Forum Highlights',
     themeColor: '#10B981',
     bgGradient: 'from-emerald-600/30 via-slate-900/90 to-brand-navy-dark/95',
-    bgImage: '/images/forum_hero.jpg'
+    bgImage: '/images/forum_hero.jpg',
+    link: '/projects/future-academy'
   }
 ];
 
