@@ -4,9 +4,14 @@ import { Calendar, ChevronRight, ChevronLeft, X } from 'lucide-react';
 import { loadConfig } from '../utils/configLoader';
 import { initialNewsArticles } from '../data/siteInitialData';
 import type { NewsArticleData } from '../data/siteInitialData';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function LatestNews() {
   const [allNews, setAllNews] = useState<NewsArticleData[]>(initialNewsArticles);
+  const { language, t } = useLanguage();
+
+  // Bilingual helper: prefer _en field when English, fallback to Chinese
+  const bi = (zh: string, en?: string) => (language === 'en' && en) ? en : zh;
   const [visibleCount, setVisibleCount] = useState<number>(6);
   const [selectedArticle, setSelectedArticle] = useState<NewsArticleData | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
@@ -51,10 +56,10 @@ export default function LatestNews() {
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 space-y-6 md:space-y-0">
           <div className="space-y-4">
             <span className="text-xs font-bold uppercase tracking-widest text-brand-amber bg-brand-amber/10 px-3.5 py-1.5 rounded-full">
-              LATEST UPDATES
+              {t('home.news.label')}
             </span>
             <h2 className="text-3xl md:text-5xl font-heading font-extrabold text-slate-900">
-              最新消息與動態
+              {t('home.news.title')}
             </h2>
           </div>
         </div>
@@ -113,12 +118,12 @@ export default function LatestNews() {
                       className="text-lg md:text-xl font-heading font-bold text-slate-800 group-hover:text-brand-orange transition-colors duration-300 line-clamp-2 leading-snug cursor-pointer"
                       onClick={() => openArticle(item)}
                     >
-                      {item.title}
+                      {bi(item.title, (item as any).title_en)}
                     </h3>
 
                     {/* Summary */}
                     <p className="text-sm text-slate-500 leading-relaxed font-light line-clamp-3">
-                      {item.summary}
+                      {bi(item.summary, (item as any).summary_en)}
                     </p>
                   </div>
                 </div>
@@ -129,7 +134,7 @@ export default function LatestNews() {
                     onClick={() => openArticle(item)}
                     className="flex items-center space-x-1.5 text-xs font-bold text-brand-orange group-hover:text-brand-orange/80 transition-colors duration-300"
                   >
-                    <span>詳細閱讀</span>
+                    <span>{t('home.news.read')}</span>
                     <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-300" />
                   </button>
                 </div>
@@ -145,7 +150,7 @@ export default function LatestNews() {
               onClick={handleLoadMore}
               className="px-8 py-3.5 rounded-xl border border-slate-300 hover:border-slate-800 bg-transparent text-slate-700 hover:text-slate-900 text-sm font-semibold tracking-wide shadow-md transition-all duration-300"
             >
-              載入更多消息
+              {t('home.news.loadmore')}
             </button>
           </div>
         )}
@@ -258,7 +263,7 @@ export default function LatestNews() {
 
                 {/* Title */}
                 <h3 className="text-xl md:text-3xl font-heading font-extrabold text-slate-900 leading-snug">
-                  {selectedArticle.title}
+                  {bi(selectedArticle.title, (selectedArticle as any).title_en)}
                 </h3>
 
                 {/* Divider */}
@@ -266,7 +271,7 @@ export default function LatestNews() {
 
                 {/* Full body content formatted as paragraphs */}
                 <div className="text-sm md:text-base text-slate-600 leading-relaxed space-y-4 font-light whitespace-pre-wrap">
-                  {selectedArticle.summary.split('\n').map((para, pIdx) => {
+                  {bi(selectedArticle.summary, (selectedArticle as any).summary_en).split('\n').map((para, pIdx) => {
                     const cleanPara = para.trim();
                     if (!cleanPara) return null;
                     return <p key={pIdx}>{cleanPara}</p>;

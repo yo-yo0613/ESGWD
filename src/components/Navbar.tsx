@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Menu, X, Globe, ChevronDown } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 interface NavbarProps {
   activeSection: string;
@@ -10,6 +11,9 @@ export default function Navbar({ activeSection }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [projectsOpen, setProjectsOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+
+  const { language, setLanguage, t } = useLanguage();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -25,8 +29,6 @@ export default function Navbar({ activeSection }: NavbarProps) {
   const handleLogoClick = () => {
     window.location.href = '/';
   };
-
-
 
   const linkColorClass = showSolidNav
     ? 'text-slate-600 hover:text-slate-900'
@@ -58,15 +60,15 @@ export default function Navbar({ activeSection }: NavbarProps) {
               {/* 關於我們 Dropdown */}
               <div className="relative group">
                 <button className={`flex items-center space-x-1 py-2 text-sm font-medium tracking-wide transition-colors duration-300 ${linkColorClass}`}>
-                  <span>關於我們</span>
+                  <span>{t('nav.about')}</span>
                   <ChevronDown className="w-3.5 h-3.5 transition-transform duration-300 group-hover:rotate-180" />
                 </button>
                 <div className="absolute left-0 top-full pt-2 hidden group-hover:block z-50">
                   <div className="w-48 bg-white border border-slate-100 rounded-2xl shadow-xl py-2">
-                    <a href="/about/association" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">本會介紹</a>
-                    <a href="/about/board" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">董事會介紹</a>
-                    <a href="/about/team" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">團隊夥伴</a>
-                    <a href="/about/disclosures" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">公開資訊</a>
+                    <a href="/about/association" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">{t('nav.about.intro')}</a>
+                    <a href="/about/board" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">{t('nav.about.board')}</a>
+                    <a href="/about/team" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">{t('nav.about.team')}</a>
+                    <a href="/about/disclosures" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">{t('nav.about.disclosure')}</a>
                   </div>
                 </div>
               </div>
@@ -78,21 +80,21 @@ export default function Navbar({ activeSection }: NavbarProps) {
                   activeSection === 'news' ? 'text-brand-orange font-bold' : ''
                 }`}
               >
-                最新消息
+                {t('nav.news')}
               </a>
 
               {/* 服務專案 Dropdown */}
               <div className="relative group">
                 <button className={`flex items-center space-x-1 py-2 text-sm font-medium tracking-wide transition-colors duration-300 ${linkColorClass}`}>
-                  <span>服務專案</span>
+                  <span>{t('nav.services')}</span>
                   <ChevronDown className="w-3.5 h-3.5 transition-transform duration-300 group-hover:rotate-180" />
                 </button>
                 <div className="absolute left-0 top-full pt-2 hidden group-hover:block z-50">
                   <div className="w-52 bg-white border border-slate-100 rounded-2xl shadow-xl py-2">
-                    <a href="/projects/future-academy" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">未來學院</a>
-                    <a href="/projects/golden-constant" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">金恆獎</a>
-                    <a href="/projects/goodness-literacy" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">良善素養教育</a>
-                    <a href="/projects/concert" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">世界公民年度音樂會</a>
+                    <a href="/projects/future-academy" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">{t('nav.services.academy')}</a>
+                    <a href="/projects/golden-constant" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">{t('nav.services.award')}</a>
+                    <a href="/projects/goodness-literacy" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">{t('nav.services.goodness')}</a>
+                    <a href="/projects/concert" className="block px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-orange hover:bg-slate-50 transition-colors">{t('nav.services.concert')}</a>
                   </div>
                 </div>
               </div>
@@ -102,7 +104,7 @@ export default function Navbar({ activeSection }: NavbarProps) {
                 href="/publications"
                 className={`py-2 text-sm font-medium tracking-wide transition-colors duration-300 ${linkColorClass}`}
               >
-                出版品
+                {t('nav.publications')}
               </a>
 
               {/* 社群分享 Link */}
@@ -110,26 +112,50 @@ export default function Navbar({ activeSection }: NavbarProps) {
                 href="/social"
                 className={`py-2 text-sm font-medium tracking-wide transition-colors duration-300 ${linkColorClass}`}
               >
-                社群分享
+                {t('nav.social')}
               </a>
             </div>
 
             <div className={`flex items-center space-x-4 border-l pl-6 transition-colors duration-300 ${
               showSolidNav ? 'border-slate-200' : 'border-slate-200 lg:border-white/10'
             }`}>
-              <button className={`transition-colors duration-300 flex items-center space-x-1 text-sm font-medium ${
-                showSolidNav
-                  ? 'text-slate-600 hover:text-slate-900'
-                  : 'text-slate-300 lg:text-white/70 lg:hover:text-white hover:text-slate-900'
-              }`}>
-                <Globe className="w-4 h-4" />
-                <span>繁中</span>
-              </button>
+              {/* Language Toggle Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setLangOpen(!langOpen)}
+                  onBlur={() => setTimeout(() => setLangOpen(false), 150)}
+                  className={`transition-colors duration-300 flex items-center space-x-1.5 text-sm font-medium px-3 py-1.5 rounded-full border transition-all ${
+                    showSolidNav
+                      ? 'text-slate-600 hover:text-slate-900 border-slate-200 hover:border-slate-400'
+                      : 'text-white/80 hover:text-white border-white/20 hover:border-white/50'
+                  }`}
+                >
+                  <Globe className="w-4 h-4" />
+                  <span>{language === 'zh' ? '繁中' : 'EN'}</span>
+                  <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${langOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {langOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-32 bg-white border border-slate-100 rounded-2xl shadow-xl py-2 z-50">
+                    <button
+                      onClick={() => { setLanguage('zh'); setLangOpen(false); }}
+                      className={`w-full text-left px-5 py-2 text-xs font-semibold hover:text-brand-orange hover:bg-slate-50 transition-colors ${language === 'zh' ? 'text-brand-orange' : 'text-slate-600'}`}
+                    >
+                      繁中
+                    </button>
+                    <button
+                      onClick={() => { setLanguage('en'); setLangOpen(false); }}
+                      className={`w-full text-left px-5 py-2 text-xs font-semibold hover:text-brand-orange hover:bg-slate-50 transition-colors ${language === 'en' ? 'text-brand-orange' : 'text-slate-600'}`}
+                    >
+                      English
+                    </button>
+                  </div>
+                )}
+              </div>
               <a 
                 href="/donate"
                 className="px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider text-brand-navy bg-gradient-to-r from-brand-amber to-brand-orange hover:shadow-lg hover:shadow-brand-orange/20 hover:scale-105 active:scale-95 transition-all duration-300"
               >
-                支持我們
+                {t('nav.support')}
               </a>
             </div>
           </div>
@@ -171,15 +197,15 @@ export default function Navbar({ activeSection }: NavbarProps) {
                 onClick={() => setAboutOpen(!aboutOpen)}
                 className="w-full flex items-center justify-between py-2 text-base font-semibold text-slate-700 border-b border-slate-100"
               >
-                <span>關於我們</span>
+                <span>{t('nav.about')}</span>
                 <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${aboutOpen ? 'rotate-180 text-brand-orange' : ''}`} />
               </button>
               {aboutOpen && (
                 <div className="pl-4 py-1 space-y-1 bg-slate-50/50 rounded-xl">
-                  <a href="/about/association" onClick={() => setIsOpen(false)} className="block py-2 text-sm font-medium text-slate-500 hover:text-brand-orange">本會介紹</a>
-                  <a href="/about/board" onClick={() => setIsOpen(false)} className="block py-2 text-sm font-medium text-slate-500 hover:text-brand-orange">董事會介紹</a>
-                  <a href="/about/team" onClick={() => setIsOpen(false)} className="block py-2 text-sm font-medium text-slate-500 hover:text-brand-orange">團隊夥伴</a>
-                  <a href="/about/disclosures" onClick={() => setIsOpen(false)} className="block py-2 text-sm font-medium text-slate-500 hover:text-brand-orange">公開資訊</a>
+                  <a href="/about/association" onClick={() => setIsOpen(false)} className="block py-2 text-sm font-medium text-slate-500 hover:text-brand-orange">{t('nav.about.intro')}</a>
+                  <a href="/about/board" onClick={() => setIsOpen(false)} className="block py-2 text-sm font-medium text-slate-500 hover:text-brand-orange">{t('nav.about.board')}</a>
+                  <a href="/about/team" onClick={() => setIsOpen(false)} className="block py-2 text-sm font-medium text-slate-500 hover:text-brand-orange">{t('nav.about.team')}</a>
+                  <a href="/about/disclosures" onClick={() => setIsOpen(false)} className="block py-2 text-sm font-medium text-slate-500 hover:text-brand-orange">{t('nav.about.disclosure')}</a>
                 </div>
               )}
             </div>
@@ -190,7 +216,7 @@ export default function Navbar({ activeSection }: NavbarProps) {
               onClick={() => setIsOpen(false)}
               className="block py-2 text-base font-semibold text-slate-700 border-b border-slate-100"
             >
-              最新消息
+              {t('nav.news')}
             </a>
 
             {/* 服務專案 Accordion */}
@@ -199,15 +225,15 @@ export default function Navbar({ activeSection }: NavbarProps) {
                 onClick={() => setProjectsOpen(!projectsOpen)}
                 className="w-full flex items-center justify-between py-2 text-base font-semibold text-slate-700 border-b border-slate-100"
               >
-                <span>服務專案</span>
+                <span>{t('nav.services')}</span>
                 <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${projectsOpen ? 'rotate-180 text-brand-orange' : ''}`} />
               </button>
               {projectsOpen && (
                 <div className="pl-4 py-1 space-y-1 bg-slate-50/50 rounded-xl">
-                  <a href="/projects/future-academy" onClick={() => setIsOpen(false)} className="block py-2 text-sm font-medium text-slate-500 hover:text-brand-orange">未來學院</a>
-                  <a href="/projects/golden-constant" onClick={() => setIsOpen(false)} className="block py-2 text-sm font-medium text-slate-500 hover:text-brand-orange">金恆獎</a>
-                  <a href="/projects/goodness-literacy" onClick={() => setIsOpen(false)} className="block py-2 text-sm font-medium text-slate-500 hover:text-brand-orange">良善素養教育</a>
-                  <a href="/projects/concert" onClick={() => setIsOpen(false)} className="block py-2 text-sm font-medium text-slate-500 hover:text-brand-orange">世界公民年度音樂會</a>
+                  <a href="/projects/future-academy" onClick={() => setIsOpen(false)} className="block py-2 text-sm font-medium text-slate-500 hover:text-brand-orange">{t('nav.services.academy')}</a>
+                  <a href="/projects/golden-constant" onClick={() => setIsOpen(false)} className="block py-2 text-sm font-medium text-slate-500 hover:text-brand-orange">{t('nav.services.award')}</a>
+                  <a href="/projects/goodness-literacy" onClick={() => setIsOpen(false)} className="block py-2 text-sm font-medium text-slate-500 hover:text-brand-orange">{t('nav.services.goodness')}</a>
+                  <a href="/projects/concert" onClick={() => setIsOpen(false)} className="block py-2 text-sm font-medium text-slate-500 hover:text-brand-orange">{t('nav.services.concert')}</a>
                 </div>
               )}
             </div>
@@ -218,7 +244,7 @@ export default function Navbar({ activeSection }: NavbarProps) {
               onClick={() => setIsOpen(false)}
               className="block py-2 text-base font-semibold text-slate-700 border-b border-slate-100"
             >
-              出版品
+              {t('nav.publications')}
             </a>
 
             {/* 社群分享 Link */}
@@ -227,21 +253,32 @@ export default function Navbar({ activeSection }: NavbarProps) {
               onClick={() => setIsOpen(false)}
               className="block py-2 text-base font-semibold text-slate-700 border-b border-slate-100"
             >
-              社群分享
+              {t('nav.social')}
             </a>
           </div>
 
           <div className="space-y-4 pt-12">
-            <button className="w-full py-3 border border-slate-200 rounded-xl text-slate-700 hover:bg-slate-50 transition-colors duration-300 flex items-center justify-center space-x-2 text-sm font-semibold">
-              <Globe className="w-4 h-4" />
-              <span>切換語言 (繁中)</span>
-            </button>
+            {/* Mobile Language Toggle */}
+            <div className="flex rounded-xl border border-slate-200 overflow-hidden">
+              <button
+                onClick={() => setLanguage('zh')}
+                className={`flex-1 py-3 text-sm font-semibold transition-colors ${language === 'zh' ? 'bg-brand-orange text-white' : 'text-slate-600 hover:bg-slate-50'}`}
+              >
+                繁中
+              </button>
+              <button
+                onClick={() => setLanguage('en')}
+                className={`flex-1 py-3 text-sm font-semibold transition-colors ${language === 'en' ? 'bg-brand-orange text-white' : 'text-slate-600 hover:bg-slate-50'}`}
+              >
+                English
+              </button>
+            </div>
             <a 
               href="/donate"
               onClick={() => setIsOpen(false)}
               className="w-full py-4 rounded-xl text-brand-navy font-bold bg-gradient-to-r from-brand-amber to-brand-orange hover:shadow-lg transition-all duration-300 block text-center text-sm"
             >
-              支持我們
+              {t('nav.support')}
             </a>
           </div>
         </div>
